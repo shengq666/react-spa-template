@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Button, Card, List, Tag } from 'antd-mobile'
+import { Button, Card, Tag } from 'antd-mobile'
 import { BRAND_QUERY_KEY } from '@/constants'
 import { BRAND_OPTIONS, isValidBrandId, type BrandId } from '@/theme/tokens'
 import { useTheme } from '@/theme/useTheme'
@@ -8,7 +8,7 @@ import './index.scss'
 
 export default function ThemeDemo() {
 	const [searchParams, setSearchParams] = useSearchParams()
-	const { brandId, tokens: theme, setBrand } = useTheme()
+	const { brandId, setBrand } = useTheme()
 
 	// 根据 URL 中的 brandId 初始化主题
 	useEffect(() => {
@@ -64,16 +64,6 @@ export default function ThemeDemo() {
 						错误按钮（errorColor）
 					</Button>
 				</div>
-
-				<List header="当前主题配置">
-					<List.Item extra={theme.primaryColor}>primaryColor</List.Item>
-					<List.Item extra={theme.successColor}>successColor</List.Item>
-					<List.Item extra={theme.warningColor}>warningColor</List.Item>
-					<List.Item extra={theme.errorColor}>errorColor</List.Item>
-					<List.Item extra={theme.textColor}>textColor</List.Item>
-					<List.Item extra={theme.bgColor}>bgColor</List.Item>
-					<List.Item extra={theme.bgColorSecondary}>bgColorSecondary</List.Item>
-				</List>
 			</Card>
 		</div>
 	)
