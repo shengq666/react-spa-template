@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { storage } from '@/utils/storage'
 import { STORAGE_KEYS } from '@/constants'
-import { applyThemeTokens } from './applyTheme'
+import { applyTheme } from './applyTheme'
 import { BRAND_THEME_MAP, type BrandId, type ThemeTokens } from './tokens'
 
 interface ThemeState {
@@ -24,7 +24,8 @@ const useThemeStore = create<ThemeState>(set => ({
 		const tokens = BRAND_THEME_MAP[brandId]
 		storage.set(STORAGE_KEYS.THEME, brandId)
 		set({ brandId, tokens })
-		applyThemeTokens(tokens)
+		// 通过切换 CSS class 来应用主题（主题变量已在 SCSS 文件中定义）
+		applyTheme(brandId)
 	},
 }))
 
@@ -33,8 +34,7 @@ export function useTheme() {
 }
 
 export function initTheme() {
-	const { tokens } = useThemeStore.getState()
-	applyThemeTokens(tokens)
+	const { brandId } = useThemeStore.getState()
+	// 初始化时应用主题 class
+	applyTheme(brandId)
 }
-
-

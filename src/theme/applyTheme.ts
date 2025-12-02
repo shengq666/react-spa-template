@@ -1,22 +1,22 @@
-import type { ThemeTokens } from './tokens'
+import type { BrandId } from './tokens'
 
-export function applyThemeTokens(tokens: ThemeTokens) {
+/**
+ * 通过切换 CSS class 来应用主题
+ * 所有主题变量已在 SCSS 文件中定义（styles/theme/*.scss）
+ */
+export function applyTheme(brandId: BrandId) {
 	const root = document.documentElement
+	const body = document.body
 
-	// 自定义 CSS 变量
-	root.style.setProperty('--primary-color', tokens.primaryColor)
-	root.style.setProperty('--success-color', tokens.successColor)
-	root.style.setProperty('--warning-color', tokens.warningColor)
-	root.style.setProperty('--error-color', tokens.errorColor)
-	root.style.setProperty('--text-color', tokens.textColor)
-	root.style.setProperty('--bg-color', tokens.bgColor)
-	root.style.setProperty('--bg-color-secondary', tokens.bgColorSecondary)
+	// 移除所有主题 class
+	const themeClasses = ['theme-default', 'theme-brand1', 'theme-brand2']
+	themeClasses.forEach(className => {
+		root.classList.remove(className)
+		body.classList.remove(className)
+	})
 
-	// antd-mobile 内置 CSS 变量
-	root.style.setProperty('--adm-color-primary', tokens.primaryColor)
-	root.style.setProperty('--adm-color-success', tokens.successColor)
-	root.style.setProperty('--adm-color-warning', tokens.warningColor)
-	root.style.setProperty('--adm-color-danger', tokens.errorColor)
+	// 添加当前主题 class
+	const themeClass = `theme-${brandId}`
+	root.classList.add(themeClass)
+	body.classList.add(themeClass)
 }
-
-

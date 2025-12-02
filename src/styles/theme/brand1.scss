@@ -1,0 +1,28 @@
+// 品牌一主题
+.theme-brand1 {
+	// 自定义 CSS 变量
+	--primary-color: #00b578;
+	--success-color: #00b578;
+	--warning-color: #ff8f1f;
+	--error-color: #ff3141;
+	--text-color: #222222;
+	--text-color-secondary: #666666;
+	--border-color: #e5e5e5;
+	--bg-color: #ffffff;
+	--bg-color-secondary: #f0fdf4;
+
+	// antd-mobile 官方 CSS 变量
+	--adm-color-primary: #00b578;
+	--adm-color-success: #00b578;
+	--adm-color-warning: #ff8f1f;
+	--adm-color-danger: #ff3141;
+	--adm-color-white: #ffffff;
+	--adm-color-text: #222222;
+	--adm-color-text-secondary: #666666;
+	--adm-color-weak: #999999;
+	--adm-color-light: #cccccc;
+	--adm-color-border: #eeeeee;
+	--adm-color-box: #f0fdf4;
+	--adm-color-background: #ffffff;
+}
+

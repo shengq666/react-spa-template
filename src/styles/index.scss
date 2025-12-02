@@ -2,6 +2,11 @@
 @use './variables.scss';
 @use '../theme/antd-overrides.scss';
 
+// 引入所有主题文件（构建时打包，运行时通过 class 切换）
+@use './theme/default.scss';
+@use './theme/brand1.scss';
+@use './theme/brand2.scss';
+
 // 全局样式
 .app-container {
 	width: 100%;
