@@ -16,6 +16,7 @@ export const ROUTE_PATH = {
   HOME: '/',
   USER: '/user',
   LOGIN: '/login',
+  NOT_FOUND: '/404',
 } as const
 
 // 存储键名
