@@ -1,0 +1,35 @@
+.theme-demo-page {
+	min-height: 100vh;
+	padding: 16px;
+	background-color: var(--bg-color-secondary);
+}
+
+.theme-demo-title {
+	margin-bottom: 8px;
+	font-size: var(--font-size-lg);
+	color: var(--text-color);
+}
+
+.theme-demo-desc {
+	margin-bottom: 16px;
+	color: var(--text-color-secondary);
+}
+
+.theme-demo-card {
+	margin-bottom: 16px;
+}
+
+.theme-demo-buttons {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.theme-demo-preview {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+

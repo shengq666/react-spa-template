@@ -17,7 +17,11 @@ export const ROUTE_PATH = {
   USER: '/user',
   LOGIN: '/login',
   NOT_FOUND: '/404',
+  THEME_DEMO: '/theme-demo',
 } as const
+
+// 品牌主题相关（用于多主题切换）
+export const BRAND_QUERY_KEY = 'brandId'
 
 // 存储键名
 export const STORAGE_KEYS = {

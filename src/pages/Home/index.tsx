@@ -114,6 +114,13 @@ export default function Home() {
           前往用户页
         </Button>
         <Button
+          color="primary"
+          size="small"
+          onClick={() => navigate(ROUTE_PATH.THEME_DEMO)}
+        >
+          前往主题配色页
+        </Button>
+        <Button
           color="success"
           size="small"
           onClick={handleEmailCheck}

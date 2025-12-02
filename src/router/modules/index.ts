@@ -1,6 +1,7 @@
 // 路由模块统一导出
 import { homeRoutes } from './home'
 import { userRoutes } from './user'
+import { themeRoutes } from './theme'
 import { ROUTE_PATH } from '@/constants'
 import type { RouteConfig } from '@/types'
 
@@ -8,6 +9,7 @@ import type { RouteConfig } from '@/types'
 export const routeModules: RouteConfig[] = [
 	...homeRoutes,
 	...userRoutes,
+	...themeRoutes,
 	{
 		path: ROUTE_PATH.NOT_FOUND,
 		name: 'NotFound',

@@ -1,0 +1,13 @@
+// 统一覆盖 antd-mobile 组件样式（基于 CSS 变量）
+
+// 示例：按钮圆角
+.adm-button {
+	border-radius: var(--border-radius-md);
+}
+
+// 示例：列表背景跟随主题
+.adm-list {
+	background-color: var(--bg-color);
+}
+
+
