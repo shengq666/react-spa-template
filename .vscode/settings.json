@@ -1,0 +1,51 @@
+{
+	// 通用编辑器配置
+	"editor.tabSize": 2,
+	"editor.insertSpaces": false, // 与 .prettierrc 中 useTabs: true 保持一致
+	"editor.detectIndentation": false,
+	"files.eol": "\n",
+
+	// 使用项目内 Prettier 作为默认格式化器
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+
+	// 按语言分别指定格式化器（避免被其他插件抢占）
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[markdown]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[scss]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+
+	// 保存时自动执行 ESLint 修复（与 pnpm lint / lint:fix 对齐）
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+
+	// 使用工作区的 TypeScript 版本
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+
+	// 让 VS Code 把 .css 当成 scss 语法高亮（你项目中主要用 scss）
+	"files.associations": {
+		"*.css": "scss"
+	}
+}
