@@ -2,10 +2,10 @@
 
 // 扩展 Window 接口
 declare global {
-  interface Window {
-    // 可以在这里添加全局 window 对象的属性
-    // 例如：__APP_CONFIG__?: AppConfig
-  }
+	interface Window {
+		// 可以在这里添加全局 window 对象的属性
+		// 例如：__APP_CONFIG__?: AppConfig
+	}
 }
 
 // 全局工具类型
@@ -15,12 +15,12 @@ export type Maybe<T> = T | null | undefined
 
 // 深度只读类型
 export type DeepReadonly<T> = {
-  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P]
+	readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P]
 }
 
 // 深度可选类型
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
+	[P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
 }
 
 // 提取 Promise 的返回类型（TypeScript 4.5+ 已内置，这里保留作为兼容）
@@ -34,48 +34,49 @@ export type AsyncFn<T = any, R = any> = (...args: T[]) => Promise<R>
 export type ValueOf<T> = T[keyof T]
 
 // 数组元素类型
-export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never
+export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
+	? ElementType
+	: never
 
 // 模块声明
 declare module '*.svg' {
-  const content: string
-  export default content
+	const content: string
+	export default content
 }
 
 declare module '*.png' {
-  const content: string
-  export default content
+	const content: string
+	export default content
 }
 
 declare module '*.jpg' {
-  const content: string
-  export default content
+	const content: string
+	export default content
 }
 
 declare module '*.jpeg' {
-  const content: string
-  export default content
+	const content: string
+	export default content
 }
 
 declare module '*.gif' {
-  const content: string
-  export default content
+	const content: string
+	export default content
 }
 
 declare module '*.webp' {
-  const content: string
-  export default content
+	const content: string
+	export default content
 }
 
 declare module '*.css' {
-  const content: Record<string, string>
-  export default content
+	const content: Record<string, string>
+	export default content
 }
 
 declare module '*.scss' {
-  const content: Record<string, string>
-  export default content
+	const content: Record<string, string>
+	export default content
 }
 
 export {}
-

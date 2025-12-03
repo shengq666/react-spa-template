@@ -22,28 +22,28 @@ router/
 import type { RouteConfig } from '@/types'
 
 export const memberRoutes: RouteConfig[] = [
-  {
-    path: '/member',
-    name: 'MemberHome',
-    meta: {
-      title: '会员中心',
-      requiresAuth: true,
-    },
-    component: () => import('@/pages/Member/Home/index'),
-    guard: async () => {
-      // 路由守卫逻辑
-      return true
-    },
-  },
-  {
-    path: '/member/profile',
-    name: 'MemberProfile',
-    meta: {
-      title: '个人资料',
-      requiresAuth: true,
-    },
-    component: () => import('@/pages/Member/Profile/index'),
-  },
+	{
+		path: '/member',
+		name: 'MemberHome',
+		meta: {
+			title: '会员中心',
+			requiresAuth: true,
+		},
+		component: () => import('@/pages/Member/Home/index'),
+		guard: async () => {
+			// 路由守卫逻辑
+			return true
+		},
+	},
+	{
+		path: '/member/profile',
+		name: 'MemberProfile',
+		meta: {
+			title: '个人资料',
+			requiresAuth: true,
+		},
+		component: () => import('@/pages/Member/Profile/index'),
+	},
 ]
 ```
 
@@ -53,18 +53,18 @@ export const memberRoutes: RouteConfig[] = [
 // src/router/modules/index.ts
 import { homeRoutes } from './home'
 import { userRoutes } from './user'
-import { memberRoutes } from './member'  // 新增
+import { memberRoutes } from './member' // 新增
 import type { RouteConfig } from '@/types'
 
 export const routeModules: RouteConfig[] = [
-  ...homeRoutes,
-  ...userRoutes,
-  ...memberRoutes,  // 新增
-  // 404 重定向（必须放在最后）
-  {
-    path: '*',
-    redirect: '/',
-  },
+	...homeRoutes,
+	...userRoutes,
+	...memberRoutes, // 新增
+	// 404 重定向（必须放在最后）
+	{
+		path: '*',
+		redirect: '/',
+	},
 ]
 ```
 
@@ -127,4 +127,3 @@ src/
 ```
 
 详细说明请参考：[Subpackages 架构设计文档](../../../docs/SUBPACKAGES_ARCHITECTURE.md)
-

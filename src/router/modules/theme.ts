@@ -13,5 +13,3 @@ export const themeRoutes: RouteConfig[] = [
 		component: () => import('@/pages/ThemeDemo/index'),
 	},
 ]
-
-

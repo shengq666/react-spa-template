@@ -1,66 +1,65 @@
 .home-page {
-  padding: 16px;
-  background: var(--bg-color-secondary);
-  min-height: 100vh;
+	padding: 16px;
+	background: var(--bg-color-secondary);
+	min-height: 100vh;
 
-  .home-header {
-    margin-bottom: 16px;
-    padding: 16px;
-    background: var(--bg-color);
-    border-radius: var(--border-radius-md);
+	.home-header {
+		margin-bottom: 16px;
+		padding: 16px;
+		background: var(--bg-color);
+		border-radius: var(--border-radius-md);
 
-    .home-title {
-      font-size: var(--font-size-xl);
-      font-weight: bold;
-      color: var(--text-color);
-      margin-bottom: 8px;
-    }
+		.home-title {
+			font-size: var(--font-size-xl);
+			font-weight: bold;
+			color: var(--text-color);
+			margin-bottom: 8px;
+		}
 
-    .home-time {
-      font-size: var(--font-size-sm);
-      color: var(--text-color-secondary);
-    }
-  }
+		.home-time {
+			font-size: var(--font-size-sm);
+			color: var(--text-color-secondary);
+		}
+	}
 
-  .home-actions {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
+	.home-actions {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 16px;
+		flex-wrap: wrap;
+	}
 
-  .list-item {
-    &-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
-    }
+	.list-item {
+		&-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			margin-bottom: 8px;
+		}
 
-    &-title {
-      font-size: var(--font-size-md);
-      font-weight: 600;
-      color: var(--text-color);
-      flex: 1;
-      margin-right: 8px;
-    }
+		&-title {
+			font-size: var(--font-size-md);
+			font-weight: 600;
+			color: var(--text-color);
+			flex: 1;
+			margin-right: 8px;
+		}
 
-    &-content {
-      font-size: var(--font-size-sm);
-      color: var(--text-color-secondary);
-      line-height: 1.6;
-      margin-bottom: 8px;
-    }
+		&-content {
+			font-size: var(--font-size-sm);
+			color: var(--text-color-secondary);
+			line-height: 1.6;
+			margin-bottom: 8px;
+		}
 
-    &-footer {
-      display: flex;
-      justify-content: flex-end;
-    }
+		&-footer {
+			display: flex;
+			justify-content: flex-end;
+		}
 
-    &-time {
-      font-size: var(--font-size-xs);
-      color: var(--text-color-secondary);
-    }
-  }
+		&-time {
+			font-size: var(--font-size-xs);
+			color: var(--text-color-secondary);
+		}
+	}
 }
-
