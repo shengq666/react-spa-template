@@ -10,17 +10,23 @@ export interface BasicResponse<T = any> {
 	message: string
 }
 
-// 扩展请求配置：支持 per-request 超时 / 额外 headers / 是否返回原始响应等
-export interface RequestConfig<T = any> extends AxiosRequestConfig {
+/**
+ * 单次请求的“行为开关”配置
+ * - 与 AxiosRequestConfig 解耦，只描述业务侧如何处理这次请求的响应
+ */
+export interface RequestOptions {
 	/**
 	 * 是否返回原始 AxiosResponse（包含 headers、status 等）
-	 * - 默认 false：返回已解包后的业务数据（通常是 res.data）
+	 * - 默认 false：返回已解包后的业务数据（通常是 data 字段）
 	 */
-	raw?: boolean
+	isReturnNativeResponse?: boolean
+
 	/**
-	 * 期望的响应数据类型（仅用于类型提示）
+	 * 是否按约定格式 (code/data/message) 进行处理
+	 * - true：按 BasicResponse 约定解包并做 code 处理（默认）
+	 * - false：直接返回 response.data，不做任何包装
 	 */
-	responseTypeHint?: T
+	isTransformResponse?: boolean
 }
 
 // 创建 axios 实例
@@ -51,14 +57,21 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
 	(response: AxiosResponse) => {
-		const config = response.config as RequestConfig
+		// 从 config 上取出业务行为配置（第二个 RequestOptions 参数会被挂到 requestOptions 上）
+		const config: AxiosRequestConfig & { requestOptions?: RequestOptions } = response.config
+		const options = config.requestOptions || {}
+		const isReturnNativeResponse = options.isReturnNativeResponse === true
+		const isTransformResponse = options.isTransformResponse !== false // 默认 true
 
-		// 如果调用方显式要求原始响应，则直接返回 AxiosResponse
-		if (config.raw) return response
+		// 1. 请求方显式要求原始响应，则直接返回 AxiosResponse
+		if (isReturnNativeResponse) return response
 
 		const res = response.data as BasicResponse | any
 
-		// 如果是符合约定的业务响应结构（包含 code 字段），做统一处理
+		// 2. 不进行任何处理，直接返回 data（常用于特殊接口或自定义解析）
+		if (!isTransformResponse) return res
+
+		// 3. 标准业务响应：包含 code / data / message 字段
 		if (res && typeof res === 'object' && 'code' in res) {
 			if (res.code !== 200) {
 				// token 过期或无效
@@ -75,7 +88,7 @@ service.interceptors.response.use(
 			return (res as BasicResponse).data
 		}
 
-		// 否则视为“非标准业务响应”，直接透传 data
+		// 4. 非标准业务响应，直接透传 data
 		return res
 	},
 	(error: AxiosError) => {
@@ -115,55 +128,81 @@ service.interceptors.response.use(
  * 核心请求方法
  *
  * 支持两种使用方式：
- * 1) 统一配置式：
- *    request<BasicResponseModel<ProductItem[]>>({
+ * 1) 统一配置式（行为开关放在第二个 RequestOptions 参数中）：
+ *    request<BasicResponseModel<ProductItem[]>>(
+ *      {
  *      url: '/api/xxx',
  *      method: 'post',
  *      data: params,
- *    })
+ *      timeout: 3000,
+ *    },
+ *    {
+ *      isReturnNativeResponse: false,
+ *      isTransformResponse: true,
+ *    },
+ *    )
  *
  * 2) 语法糖：
  *    request.get<ApiResponse<PaginationResponse<any>>>('/list', { params })
  */
-export function request<T = any>(config: RequestConfig<T>): Promise<T> {
-	return service.request<T, any>({
+export function request<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
+	const mergedConfig: AxiosRequestConfig & { requestOptions?: RequestOptions } = {
 		...config,
-	})
+		requestOptions: options,
+	}
+	return service.request<T, any>(mergedConfig)
 }
 
 // 语法糖方法，贴合 axios / 业务开发习惯
-request.get = <T = any>(url: string, config?: RequestConfig<T>): Promise<T> => {
-	return request<T>({
-		url,
-		method: 'get',
-		...(config || {}),
-	})
+request.get = <T = any>(url: string, config?: AxiosRequestConfig, options?: RequestOptions): Promise<T> => {
+	return request<T>(
+		{
+			...(config || {}),
+			url,
+			method: 'get',
+		},
+		options,
+	)
 }
 
-request.post = <T = any>(url: string, data?: any, config?: RequestConfig<T>): Promise<T> => {
-	return request<T>({
-		url,
-		method: 'post',
-		data,
-		...(config || {}),
-	})
+request.post = <T = any>(
+	url: string,
+	data?: any,
+	config?: AxiosRequestConfig,
+	options?: RequestOptions,
+): Promise<T> => {
+	return request<T>(
+		{
+			...(config || {}),
+			url,
+			method: 'post',
+			data,
+		},
+		options,
+	)
 }
 
-request.put = <T = any>(url: string, data?: any, config?: RequestConfig<T>): Promise<T> => {
-	return request<T>({
-		url,
-		method: 'put',
-		data,
-		...(config || {}),
-	})
+request.put = <T = any>(url: string, data?: any, config?: AxiosRequestConfig, options?: RequestOptions): Promise<T> => {
+	return request<T>(
+		{
+			...(config || {}),
+			url,
+			method: 'put',
+			data,
+		},
+		options,
+	)
 }
 
-request.delete = <T = any>(url: string, config?: RequestConfig<T>): Promise<T> => {
-	return request<T>({
-		url,
-		method: 'delete',
-		...(config || {}),
-	})
+request.delete = <T = any>(url: string, config?: AxiosRequestConfig, options?: RequestOptions): Promise<T> => {
+	return request<T>(
+		{
+			...(config || {}),
+			url,
+			method: 'delete',
+		},
+		options,
+	)
 }
 
 // 导出 axios 实例，方便极个别场景直接使用（如取消请求、拦截器扩展等）
