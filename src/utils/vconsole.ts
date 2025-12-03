@@ -4,9 +4,9 @@ let vconsoleInstance: any = null
 export const initVConsole = () => {
 	// 只在开发环境或配置启用时加载
 	if (import.meta.env.VITE_VCONSOLE_ENABLED === 'true') {
-		import('vconsole').then(VConsole => {
+		import('vconsole').then(({ default: VConsole }) => {
 			if (!vconsoleInstance) {
-				vconsoleInstance = new VConsole.default({
+				vconsoleInstance = new VConsole({
 					theme: 'dark',
 				})
 				console.log('vConsole initialized')

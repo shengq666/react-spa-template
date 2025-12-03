@@ -51,6 +51,7 @@ export default function Home() {
 			]
 			setList(mockData)
 		} catch (error) {
+			console.error(error)
 			Toast.show({
 				icon: 'fail',
 				content: '加载失败，请重试',

@@ -14,15 +14,15 @@ export const validate = {
 
 	// 身份证验证（中国）
 	idCard: (idCard: string): boolean => {
-		const reg = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dX]$/i
+		const reg = /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dX]$/i
 		return reg.test(idCard)
 	},
 
 	// URL 验证
 	url: (url: string): boolean => {
 		try {
-			new URL(url)
-			return true
+			const parsed = new URL(url)
+			return !!parsed
 		} catch {
 			return false
 		}

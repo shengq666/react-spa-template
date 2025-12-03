@@ -42,6 +42,7 @@ export default function User() {
 			setUserInfo(user)
 			setStoreUser(user)
 		} catch (error) {
+			console.error(error)
 			Toast.show({
 				icon: 'fail',
 				content: '加载用户信息失败',

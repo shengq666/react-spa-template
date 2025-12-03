@@ -8,6 +8,7 @@ export default antfu(
 	},
 	{
 		rules: {
+			'no-console': 'warn',
 			'style/member-delimiter-style': 'off',
 			// 箭头函数的参数是否必须用圆括号 () 包裹
 			'style/arrow-parens': ['error', 'as-needed'],
