@@ -1,8 +1,8 @@
-import { create } from 'zustand'
-import { storage } from '@/utils/storage'
-import { STORAGE_KEYS } from '@/constants'
-import { applyTheme } from './applyTheme'
 import type { BrandId } from './tokens'
+import { create } from 'zustand'
+import { STORAGE_KEYS } from '@/constants'
+import { storage } from '@/utils/storage'
+import { applyTheme } from './applyTheme'
 
 interface ThemeState {
 	brandId: BrandId

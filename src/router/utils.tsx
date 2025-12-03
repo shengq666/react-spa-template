@@ -1,8 +1,8 @@
-import React from 'react'
-import { Navigate, Outlet } from 'react-router-dom'
 import type { RouteObject } from 'react-router-dom'
 import type { RouteConfig } from '@/types'
-import { LazyLoad, createGuardWrapper } from './guards'
+import React from 'react'
+import { Navigate, Outlet } from 'react-router-dom'
+import { createGuardWrapper, LazyLoad } from './guards'
 
 /**
  * 将自定义的 RouteConfig 转换为 React Router 的 RouteObject

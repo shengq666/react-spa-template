@@ -1,7 +1,7 @@
+import type { RouteConfig } from '@/types'
 import React, { Suspense } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { Loading } from '@/components/Loading'
-import type { RouteConfig } from '@/types'
 
 // 懒加载包装器
 export function LazyLoad(Component: React.LazyExoticComponent<React.ComponentType<any>>) {

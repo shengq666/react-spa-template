@@ -1,4 +1,5 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios from 'axios'
 import { API_CONFIG, STORAGE_KEYS } from '@/constants'
 import { storage } from './storage'
 
@@ -24,7 +25,7 @@ service.interceptors.request.use(
 	(error: AxiosError) => {
 		console.error('Request error:', error)
 		return Promise.reject(error)
-	}
+	},
 )
 
 // 响应拦截器
@@ -75,7 +76,7 @@ service.interceptors.response.use(
 			message = '网络连接超时'
 		}
 		return Promise.reject(new Error(message))
-	}
+	},
 )
 
 // 封装请求方法

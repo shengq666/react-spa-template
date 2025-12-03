@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
+import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -27,8 +27,8 @@ export default defineConfig({
 	preview: {
 		port: 4173,
 		open: true,
-		//由于构建后的HTML在dist/entry/index.html,需要指定正确的入口
-		//注意:preview模式下,Vite会自动处理路径,但需要确保base配置正确
+		// 由于构建后的HTML在dist/entry/index.html,需要指定正确的入口
+		// 注意:preview模式下,Vite会自动处理路径,但需要确保base配置正确
 		// open: '/entry/index.html', //指定预览入口文件
 	},
 	build: {

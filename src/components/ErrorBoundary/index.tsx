@@ -1,7 +1,7 @@
-import { Component, ReactNode } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
+import type { ErrorInfo, ReactNode } from 'react'
 import { Button, Result } from 'antd-mobile'
-import type { ErrorInfo } from 'react'
+import { Component } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 
 interface ErrorBoundaryProps {
 	children: ReactNode

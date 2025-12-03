@@ -1,5 +1,5 @@
-import { ROUTE_PATH } from '@/constants'
 import type { RouteConfig } from '@/types'
+import { ROUTE_PATH } from '@/constants'
 
 // 首页模块路由
 export const homeRoutes: RouteConfig[] = [

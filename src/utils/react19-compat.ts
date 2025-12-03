@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react'
 /**
  * React 19 兼容性配置
  * 解决 antd-mobile 与 React 19 的兼容性问题
@@ -6,7 +7,6 @@
  */
 import { unstableSetRender } from 'antd-mobile'
 import { createRoot } from 'react-dom/client'
-import type { ReactElement } from 'react'
 
 /**
  * 配置 antd-mobile 使用 React 19 的新渲染 API

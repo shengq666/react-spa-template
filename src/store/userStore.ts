@@ -1,7 +1,7 @@
-import { create } from 'zustand'
 import type { UserInfo } from '@/types'
-import { storage } from '@/utils/storage'
+import { create } from 'zustand'
 import { STORAGE_KEYS } from '@/constants'
+import { storage } from '@/utils/storage'
 
 export interface UserState {
 	user: UserInfo | null

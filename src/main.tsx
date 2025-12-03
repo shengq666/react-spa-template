@@ -14,5 +14,5 @@ if (!rootElement) {
 createRoot(rootElement).render(
 	<StrictMode>
 		<AppRoot />
-	</StrictMode>
+	</StrictMode>,
 )

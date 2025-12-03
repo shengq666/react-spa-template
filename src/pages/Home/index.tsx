@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { Button, Card, List, Tag, Toast } from 'antd-mobile'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { List, Card, Button, Tag, Toast } from 'antd-mobile'
 import { PageSkeleton } from '@/components/Skeleton'
 import { ROUTE_PATH } from '@/constants'
-import { format, common, validate } from '@/utils'
+import { common, format, validate } from '@/utils'
 import './index.scss'
 
 interface ListItem {

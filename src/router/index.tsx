@@ -1,7 +1,7 @@
+import type { RouteObject } from 'react-router-dom'
 import { createHashRouter } from 'react-router-dom'
 import { routeModules } from './modules'
 import { convertRouteConfig } from './utils'
-import type { RouteObject } from 'react-router-dom'
 
 // 将自定义路由配置转换为 React Router 的 RouteObject
 const routeObjects: RouteObject[] = routeModules

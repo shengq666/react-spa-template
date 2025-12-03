@@ -1,4 +1,4 @@
-import { Result, Button } from 'antd-mobile'
+import { Button, Result } from 'antd-mobile'
 import { useNavigate } from 'react-router-dom'
 import { ROUTE_PATH } from '@/constants'
 import './index.scss'

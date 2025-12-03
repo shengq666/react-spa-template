@@ -1,8 +1,9 @@
+import type { BrandId } from '@/theme/tokens'
+import { Button, Card, Tag } from 'antd-mobile'
 import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Button, Card, Tag } from 'antd-mobile'
 import { BRAND_QUERY_KEY } from '@/constants'
-import { BRAND_OPTIONS, isValidBrandId, type BrandId } from '@/theme/tokens'
+import { BRAND_OPTIONS, isValidBrandId } from '@/theme/tokens'
 import { useTheme } from '@/theme/useTheme'
 import './index.scss'
 

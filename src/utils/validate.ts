@@ -2,7 +2,7 @@
 export const validate = {
 	// 邮箱验证
 	email: (email: string): boolean => {
-		const reg = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+		const reg = /^[\w.%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i
 		return reg.test(email)
 	},
 
@@ -14,7 +14,7 @@ export const validate = {
 
 	// 身份证验证（中国）
 	idCard: (idCard: string): boolean => {
-		const reg = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/
+		const reg = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dX]$/i
 		return reg.test(idCard)
 	},
 

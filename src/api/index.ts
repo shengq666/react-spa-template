@@ -1,7 +1,7 @@
+import type { ApiResponse, PaginationResponse } from '@/types'
 // API 接口导出
 // 示例 API（可以根据实际情况调整）
 import { request } from '@/utils/request'
-import type { ApiResponse, PaginationResponse } from '@/types'
 
 // 示例：获取用户信息
 export const getUserInfo = (id: string | number) => {

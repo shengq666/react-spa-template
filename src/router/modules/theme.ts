@@ -1,5 +1,5 @@
-import { ROUTE_PATH } from '@/constants'
 import type { RouteConfig } from '@/types'
+import { ROUTE_PATH } from '@/constants'
 
 // 主题演示模块路由
 export const themeRoutes: RouteConfig[] = [
