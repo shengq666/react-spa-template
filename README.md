@@ -128,6 +128,137 @@ API 基础配置在 `src/constants/index.ts` 中，通过环境变量 `VITE_API_
 4. 合理使用错误边界捕获错误
 5. 充分利用工具库提高开发效率
 
+## 🧱 作为脚手架如何二次开发
+
+这一节是从“脚手架”的视角，教你如何在此模板上快速扩展业务。
+
+### 1. 新增一个页面（Page）
+
+1. 在 `src/pages` 下创建新目录，例如 `Profile/`：
+   ```bash
+   src/pages/Profile/
+     ├── index.tsx
+     └── index.scss
+   ```
+2. 在 `index.tsx` 中编写页面组件，并引入样式：
+
+   ```tsx
+   import './index.scss'
+
+   export default function Profile() {
+   	return <div className="profile-page">Profile Page</div>
+   }
+   ```
+
+### 2. 注册路由
+
+路由采用“模块化配置”，在 `src/router/modules` 下新增一个路由模块：
+
+1. 新建文件 `src/router/modules/profile.ts`：
+
+   ```ts
+   import type { RouteObject } from 'react-router-dom'
+   import { lazy } from 'react'
+
+   const ProfilePage = lazy(() => import('@/pages/Profile'))
+
+   export const profileRoutes: RouteObject[] = [
+   	{
+   		path: '/profile',
+   		element: <ProfilePage />,
+   	},
+   ]
+   ```
+
+2. 在 `src/router/modules/index.ts` 中汇总导出：
+   ```ts
+   export * from './home'
+   export * from './user'
+   export * from './theme'
+   export * from './profile' // 新增
+   ```
+
+这样新页面就会自动加入到主路由表中，无需改动核心路由逻辑。
+
+### 3. 新增一个 API 接口
+
+1. 在 `src/api/index.ts` 中补充接口函数：
+
+   ```ts
+   import { request } from '@/utils/request'
+   import type { ApiResponse } from '@/types'
+
+   export const getProfile = (id: string) => {
+   	return request.get<ApiResponse<any>>(`/profile/${id}`)
+   }
+   ```
+
+2. 在页面中直接调用：
+   ```ts
+   import { getProfile } from '@/api'
+   ```
+
+### 4. 使用和扩展全局状态（Zustand）
+
+1. 在 `src/store/userStore.ts` 中查看现有示例，按需扩展字段与方法：
+   ```ts
+   export const useUserStore = create<UserState>(set => ({
+   	userInfo: null,
+   	setUserInfo: userInfo => set({ userInfo }),
+   }))
+   ```
+2. 在任意组件中使用：
+   ```ts
+   const userInfo = useUserStore(state => state.userInfo)
+   const setUserInfo = useUserStore(state => state.setUserInfo)
+   ```
+
+### 5. 新增环境变量
+
+1. 在 `.env.development` / `.env.production` 中添加：
+   ```bash
+   VITE_API_BASE_URL=https://api.example.com
+   VITE_FEATURE_X_ENABLED=true
+   ```
+2. 在代码中通过 `import.meta.env` 使用：
+   ```ts
+   const baseURL = import.meta.env.VITE_API_BASE_URL
+   const featureEnabled = import.meta.env.VITE_FEATURE_X_ENABLED === 'true'
+   ```
+3. 如果是“必需”的关键变量，可以在 `src/constants/index.ts` 中集中读取并做兜底。
+
+### 6. 新增主题 / 品牌色
+
+1. 在 `src/styles/theme` 下新增一个主题文件，例如 `brand3.scss`。
+2. 在 `src/theme/tokens.ts` 中补充主题元数据：
+
+   ```ts
+   export type BrandId = 'default' | 'brand1' | 'brand2' | 'brand3'
+
+   export const BRAND_OPTIONS: { id: BrandId; name: string }[] = [
+   	{ id: 'default', name: '默认主题' },
+   	{ id: 'brand1', name: '品牌一' },
+   	{ id: 'brand2', name: '品牌二' },
+   	{ id: 'brand3', name: '品牌三' },
+   ]
+   ```
+
+3. 在 `ThemeDemo` 页面中自动出现新主题选项（依赖上述配置）。
+
+### 7. 代码规范与提交流程
+
+1. 开发时建议开启 VS Code 的 ESLint 插件，保存自动修复大部分问题。
+2. 提交前会自动运行 `lint-staged`（由 Husky 触发），只检查改动的文件：
+   ```bash
+   git commit -m "feat: add profile page"
+   ```
+3. 如果想手动全量修复：
+   ```bash
+   pnpm lint:fix
+   ```
+
+这一整套流程就是“脚手架级”的使用姿势：**新增页面 → 注册路由 → 封装 API → 使用状态管理与主题 → 通过脚本与规范收尾**。
+
 ## 📄 License
 
 MIT
