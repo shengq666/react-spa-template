@@ -239,6 +239,8 @@ const user = useUserStore(state => state.user)
 const fetchCurrentUser = useUserStore(state => state.fetchCurrentUser)
 ```
 
+更多注意事项与踩坑提示可参考 [`docs/zustand_guide.md`](./docs/zustand_guide.md)。
+
 ### 5. 新增环境变量
 
 1. 在 `.env.development` / `.env.production` 中添加：

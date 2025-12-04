@@ -2,6 +2,7 @@ import type { RouteObject } from 'react-router-dom'
 import type { RouteConfig } from '@/types'
 import React from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
+import { RouteErrorFallback } from '@/components/RouteError'
 import { createGuardWrapper, LazyLoad } from './guards'
 
 /**
@@ -27,6 +28,7 @@ export function convertRouteConfig(config: RouteConfig): RouteObject | null {
 			return {
 				path: config.path,
 				element: <GuardWrapper>{element}</GuardWrapper>,
+				errorElement: config.errorElement ?? <RouteErrorFallback />,
 				// 支持 v7 新特性：loader 和 action
 				loader: config.loader,
 				action: config.action,
@@ -36,6 +38,7 @@ export function convertRouteConfig(config: RouteConfig): RouteObject | null {
 		return {
 			path: config.path,
 			element,
+			errorElement: config.errorElement ?? <RouteErrorFallback />,
 			loader: config.loader,
 			action: config.action,
 		}
@@ -48,6 +51,7 @@ export function convertRouteConfig(config: RouteConfig): RouteObject | null {
 			return {
 				path: config.path,
 				element: <GuardWrapper>{config.element}</GuardWrapper>,
+				errorElement: config.errorElement ?? <RouteErrorFallback />,
 				loader: config.loader,
 				action: config.action,
 			}
@@ -56,6 +60,7 @@ export function convertRouteConfig(config: RouteConfig): RouteObject | null {
 		return {
 			path: config.path,
 			element: config.element,
+			errorElement: config.errorElement ?? <RouteErrorFallback />,
 			loader: config.loader,
 			action: config.action,
 		}
@@ -70,6 +75,7 @@ export function convertRouteConfig(config: RouteConfig): RouteObject | null {
 		const routeObject: RouteObject = {
 			path: config.path,
 			children,
+			errorElement: config.errorElement ?? <RouteErrorFallback />,
 			loader: config.loader,
 			action: config.action,
 		}

@@ -1,8 +1,13 @@
+import type { BrandId } from '@/theme/tokens'
 import { Button, Card, List, Result, Tag, Toast } from 'antd-mobile'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PageSkeleton } from '@/components/Skeleton'
 import { ROUTE_PATH } from '@/constants'
+import { useAppStore } from '@/store/appStore'
+import { useUserStore } from '@/store/userStore'
+import { applyTheme } from '@/theme/applyTheme'
+import { BRAND_OPTIONS } from '@/theme/tokens'
 import { common, format, validate } from '@/utils'
 import http from '@/utils/http'
 import { reportEvent } from '@/utils/report'
@@ -34,7 +39,18 @@ export default function Home() {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [list, setList] = useState<ListItem[]>([])
-	const [currentTime, setCurrentTime] = useState(new Date())
+	const [currentTime, setCurrentTime] = useState(() => new Date())
+
+	// 分别选择字段，避免对象 selector 在 StrictMode 下造成不必要的重复渲染
+	const appReady = useAppStore(state => state.appReady)
+	const globalLoading = useAppStore(state => state.globalLoading)
+	const themeId = useAppStore(state => state.themeId)
+	const setThemeId = useAppStore(state => state.setThemeId)
+
+	const user = useUserStore(state => state.user)
+	const userLoading = useUserStore(state => state.loading)
+	const fetchCurrentUser = useUserStore(state => state.fetchCurrentUser)
+	const clearUser = useUserStore(state => state.clearUser)
 
 	// 示例：页面加载时的完整 HTTP 链路（loading + skeleton + error + 埋点）
 	const fetchBannerWithDemo = async () => {
@@ -69,7 +85,7 @@ export default function Home() {
 	const testHttp = async () => {
 		try {
 			const result = await getHomePageBannerList({ displayLocation: 2, configId: 10, guideId: 1155073, type: 3 })
-			console.log('======testHttp result', result)
+			console.warn('======testHttp result', result)
 		} catch (error: any) {
 			console.error('======testHttp error', error)
 		}
@@ -152,6 +168,46 @@ export default function Home() {
 		})
 	}
 
+	const handleThemeToggle = () => {
+		const allIds = BRAND_OPTIONS.map(item => item.id)
+		const current = (themeId as BrandId) || 'brand1'
+		const candidates = allIds.filter(id => id !== current)
+		const nextTheme = (candidates[Math.floor(Math.random() * candidates.length)] || current) as BrandId
+
+		// 更新演示用的全局状态
+		setThemeId(nextTheme)
+		// 实际应用主题（切换 CSS 变量）
+		applyTheme(nextTheme)
+
+		Toast.show({
+			content: `已切换到 ${nextTheme} 主题（示例）`,
+		})
+	}
+
+	const handleFetchUserInfo = async () => {
+		await fetchCurrentUser()
+		const latestUser = useUserStore.getState().user
+		Toast.show({
+			content: latestUser ? '已同步用户信息' : '未找到缓存的用户信息',
+		})
+	}
+
+	const handleClearUser = () => {
+		clearUser()
+		Toast.show({
+			content: '已清空用户信息',
+		})
+	}
+
+	const handleReportAction = () => {
+		reportEvent('home_manual_action', {
+			ts: Date.now(),
+		})
+		Toast.show({
+			content: '已触发示例埋点（控制台可见）',
+		})
+	}
+
 	if (loading) {
 		return <PageSkeleton rows={5} />
 	}
@@ -188,6 +244,45 @@ export default function Home() {
 					格式化数字
 				</Button>
 			</div>
+
+			<Card style={{ marginBottom: 12 }}>
+				<div className="home-meta">
+					<div>
+						<Tag color="primary">App Ready: {appReady ? '是' : '否'}</Tag>
+					</div>
+					<div style={{ margin: '8px 0' }}>
+						<Tag color="warning">Global Loading: {globalLoading ? '是' : '否'}</Tag>
+					</div>
+					<div style={{ marginBottom: 8 }}>当前主题: {themeId ?? 'default'}</div>
+					<Button size="small" onClick={handleThemeToggle}>
+						切换主题示例
+					</Button>
+				</div>
+			</Card>
+
+			<Card style={{ marginBottom: 12 }}>
+				<div className="home-meta">
+					<div style={{ marginBottom: 4 }}>用户状态：{user ? user.username || user.email || '已登录' : '未登录'}</div>
+					<div style={{ marginBottom: 8 }}>Store Loading：{userLoading ? '是' : '否'}</div>
+					<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+						<Button size="small" onClick={handleFetchUserInfo}>
+							同步用户信息
+						</Button>
+						<Button size="small" color="warning" onClick={handleClearUser}>
+							清空用户信息
+						</Button>
+					</div>
+				</div>
+			</Card>
+
+			<Card style={{ marginBottom: 12 }}>
+				<div className="home-meta">
+					<div style={{ marginBottom: 8 }}>埋点 / 事件示例</div>
+					<Button size="small" color="success" onClick={handleReportAction}>
+						触发埋点事件
+					</Button>
+				</div>
+			</Card>
 
 			<List header="文章列表">
 				{list.map(item => (

@@ -18,7 +18,7 @@ export interface AppState {
 export const useAppStore = create<AppState>(set => ({
 	appReady: false,
 	globalLoading: false,
-	themeId: storage.get<string>(STORAGE_KEYS.THEME),
+	themeId: storage.get<string>(STORAGE_KEYS.THEME) ?? 'default',
 	setGlobalLoading: globalLoading => set({ globalLoading }),
 	setThemeId: themeId => {
 		if (themeId) {

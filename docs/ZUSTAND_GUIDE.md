@@ -1,3 +1,51 @@
+# Zustand 使用指南与踩坑提示
+
+> 本项目将 Zustand 作为推荐的跨页面状态管理方案。以下是编写 store 时的一些最佳实践和常见坑点，避免在复杂场景下踩雷。
+
+## 1. 选择器（selector）要保持稳定
+
+- **不要直接返回对象字面量**，例如 `useStore(state => ({ foo: state.foo, bar: state.bar }))`。这会在每次渲染时创建新的引用，导致组件频繁重渲染，甚至与 StrictMode 叠加触发复杂更新。
+- 推荐写法：
+  ```ts
+  const foo = useStore(state => state.foo)
+  const bar = useStore(state => state.bar)
+  // 或使用 zustand/shallow: useStore(selector, shallow)
+  ```
+- 如果确实需要返回对象，务必搭配 `shallow`。
+
+## 2. 避免在渲染期间调用 `set`
+
+- 只能在事件处理、effect、异步 action 中调用 `set`。
+- 不要在组件渲染函数中直接 `setState`，否则会触发 “Maximum update depth exceeded”。
+
+## 3. 异步 action 建议写在 store 内部
+
+- 统一在 store 中封装 `fetchXXX`、`initApp` 之类的异步逻辑，方便复用和调试。
+- action 内负责维护 loading 状态 / 缓存同步，组件只关心结果。
+
+## 4. 与本地存储同步
+
+- 使用 `src/utils/storage.ts`，不要直接 `localStorage.setItem`。
+- 更新 store 时同步写 storage，可避免多处重复代码。
+
+## 5. StrictMode 下的双调用
+
+- React 18+ StrictMode 会让 `useEffect`、组件渲染等在开发环境执行两遍。
+- 如果某个 store action 在 effect 中调用，应确保它们幂等或加防抖，避免因为双调用导致重复请求或死循环。
+- 若确实只想执行一次，可以在顶层（例如 `AppRoot`）使用 `useEffect(() => { useStore.getState().action() }, [])` 这种“手动调用”方式。
+
+## 6. store 切分建议
+
+- 以业务维度拆分：`userStore`、`appStore`、`themeStore` 等。
+- 小 store 更易维护，组件也只订阅需要的部分。
+
+## 7. 调试
+
+- 可以在开发环境开启 `zustand/devtools` 或者为关键 action 打 log。
+- 注意 devtools 也会导致额外的渲染，需要在生产环境关闭。
+
+遵循上述约定，可以最大化地避免 “Maximum update depth exceeded” 等隐蔽问题，也能让 store 更易维护、扩展。欢迎在此基础上按业务需要继续封装。
+
 # Zustand 状态管理使用指南
 
 ## 概述
@@ -522,7 +570,7 @@ const unsubscribe = useCounterStore.subscribe(
 	state => state.count, // selector
 	count => {
 		console.log('count 变化了:', count)
-	}
+	},
 )
 
 // 取消订阅
@@ -585,8 +633,8 @@ export const useStore = create<State>()(
 		set => ({
 			// ... state
 		}),
-		{ name: 'MyStore' }
-	)
+		{ name: 'MyStore' },
+	),
 )
 ```
 
@@ -724,7 +772,7 @@ const TodoItem = React.memo(({ todo, onToggle }) => {
 function TodoItem({ todoId }: { todoId: string }) {
 	const todo = useTodoStore(
 		state => state.todos.find(t => t.id === todoId),
-		(a, b) => a?.completed === b?.completed && a?.text === b?.text // 自定义相等性比较
+		(a, b) => a?.completed === b?.completed && a?.text === b?.text, // 自定义相等性比较
 	)
 	const toggleTodo = useTodoStore(state => state.toggleTodo)
 
@@ -741,13 +789,13 @@ Zustand 默认使用 `Object.is` 比较，对于对象数组，可以自定义�
 // 只有当 count 变化时才重渲染
 const count = useCounterStore(
 	state => state.count,
-	(a, b) => a === b // 默认行为，可以省略
+	(a, b) => a === b, // 默认行为，可以省略
 )
 
 // 对于对象，使用浅比较
 const user = useUserStore(
 	state => state.user,
-	(a, b) => a?.id === b?.id && a?.username === b?.username
+	(a, b) => a?.id === b?.id && a?.username === b?.username,
 )
 ```
 

@@ -38,6 +38,8 @@ export interface RouteConfig {
 	// React Router v7 新特性
 	loader?: () => Promise<any> | any
 	action?: () => Promise<any> | any
+	/** 用于 React Router 的错误边界展示组件 */
+	errorElement?: React.ReactNode
 }
 
 // 用户信息类型
