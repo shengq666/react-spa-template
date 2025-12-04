@@ -20,14 +20,43 @@ export interface BasicResponse<T = any> {
  */
 export interface RequestOptions {
 	/**
-	 * 是否返回原始 AxiosResponse（包含 headers、status 等）
-	 * - 默认 false：返回已解包后的业务数据（通常是 data 字段）
+	 * 是否返回完整的 AxiosResponse（包含响应头、状态码、响应体等所有数据）
+	 * - false（默认）：只返回响应体（response.data），不包含响应头、状态码等信息
+	 * - true：返回完整的 AxiosResponse 对象，包含：
+	 *   - headers: 响应头
+	 *   - status: HTTP 状态码
+	 *   - statusText: HTTP 状态文本
+	 *   - data: 响应体
+	 *   - config: 请求配置
+	 *   - request: 请求对象
+	 *
+	 * @example
+	 * ```ts
+	 * // 默认：只返回响应体
+	 * const data = await http.get('/api/user')
+	 * // data = { code: 200, data: {...}, msg: 'OK' }
+	 *
+	 * // 返回完整响应（包含响应头等）
+	 * const response = await http.request(
+	 *   { url: '/api/user', method: 'get' },
+	 *   { isReturnNativeResponse: true }
+	 * )
+	 * // response = {
+	 * //   data: { code: 200, data: {...}, msg: 'OK' },
+	 * //   headers: { 'content-type': 'application/json', ... },
+	 * //   status: 200,
+	 * //   statusText: 'OK',
+	 * //   config: {...},
+	 * //   request: {...}
+	 * // }
+	 * // 可以访问响应头：response.headers['content-type']
+	 * ```
 	 */
 	isReturnNativeResponse?: boolean
 
 	/**
 	 * 是否按约定格式 (code/data/message) 进行处理
-	 * - true（默认）：按 BasicResponse 约定解包并做 code 处理，非 200 会抛出错误，只返回 data 字段
+	 * - true（默认）：按 BasicResponse 约定做 code 校验，非 200 会抛出错误，返回完整响应体（包含 code、data、msg、ok、timestamp 等）
 	 * - false：直接返回完整的 response.data（包含 code、message、data），不做任何处理，由业务代码自己判断 code
 	 *
 	 * @example

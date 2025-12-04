@@ -12,10 +12,12 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 	const requestOptions = config.requestOptions
 	const options = extractCustomOptions(requestOptions)
 
-	// 1. 请求方显式要求原始响应，则直接返回 AxiosResponse
+	// 1. 如果请求方需要完整的 AxiosResponse（包含响应头、状态码等），直接返回
 	if (options.isReturnNativeResponse) {
 		return response
 	}
+
+	// 默认情况下，只返回响应体（response.data），不包含响应头等信息
 
 	const res = response.data as BasicResponse | any
 
@@ -26,16 +28,21 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 
 	// 3. 标准业务响应：包含 code / data / message 字段
 	if (res && typeof res === 'object' && 'code' in res) {
-		if (res.code !== 200) {
+		// 处理 code 可能是字符串或数字的情况（如 "200" 或 200）
+		const codeValue = typeof res.code === 'string' ? Number(res.code) : res.code
+
+		if (codeValue !== 200) {
 			// token 过期或无效
-			if (res.code === 401) {
+			if (codeValue === 401) {
 				handle401Error()
 			}
-			throw new Error(res.message || '请求失败')
+			// 使用 msg 或 message 字段作为错误信息
+			const errorMsg = (res as any).msg || (res as any).message || '请求失败'
+			throw new Error(errorMsg)
 		}
 
-		// 默认只返回 data 字段，避免业务层关心响应头等细节
-		return (res as BasicResponse).data
+		// 默认返回完整响应体（包含 code、data、msg、ok、timestamp 等），而不是只返回 data
+		return res
 	}
 
 	// 4. 非标准业务响应，直接透传 data

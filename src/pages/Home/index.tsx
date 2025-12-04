@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { PageSkeleton } from '@/components/Skeleton'
 import { ROUTE_PATH } from '@/constants'
 import { common, format, validate } from '@/utils'
+import http from '@/utils/http'
 import './index.scss'
 
 interface ListItem {
@@ -13,12 +14,27 @@ interface ListItem {
 	createTime: string
 	viewCount: number
 }
-
+function getHomePageBannerList(params: any) {
+	return http.request({
+		url: 'https://qkrelease.kukahome.com/api/galleryService/bannerInfo/getHomePageBannerList',
+		method: 'get',
+		params,
+	})
+}
 export default function Home() {
 	const navigate = useNavigate()
 	const [loading, setLoading] = useState(true)
 	const [list, setList] = useState<ListItem[]>([])
 	const [currentTime, setCurrentTime] = useState(new Date())
+
+	const testHttp = async () => {
+		const result = await getHomePageBannerList({ displayLocation: 2, configId: 10, guideId: 1155073, type: 3 })
+		console.log('======result', result)
+	}
+
+	useEffect(() => {
+		testHttp()
+	}, [])
 
 	// 获取列表数据
 	const fetchList = async () => {
