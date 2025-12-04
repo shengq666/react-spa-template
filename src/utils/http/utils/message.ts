@@ -45,9 +45,8 @@ export function showErrorMessage(options: RequestOptions, errorMsg: string, cont
 			// 使用 Modal 弹窗（antd-mobile 使用 Dialog）
 			// 这里暂时使用 Toast，如果需要 Modal 可以后续添加
 			Toast.show({
-				icon: 'fail',
+				// icon: 'fail',
 				content: message,
-				duration: 3000,
 			})
 			break
 
@@ -59,7 +58,7 @@ export function showErrorMessage(options: RequestOptions, errorMsg: string, cont
 		default:
 			// 默认使用 Toast
 			Toast.show({
-				icon: 'fail',
+				// icon: 'fail',
 				content: message,
 			})
 			break
@@ -99,7 +98,7 @@ export function showSuccessMessage(options: RequestOptions, res?: any, context?:
 		}
 
 		Toast.show({
-			icon: 'success',
+			// icon: 'success',
 			content: message,
 		})
 	}
