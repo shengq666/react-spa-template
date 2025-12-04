@@ -83,10 +83,119 @@ export interface RequestOptions {
 	 */
 	skipErrorHandler?: boolean
 
-	// 未来可以在这里添加更多自定义参数，例如：
-	// errorMessageMode?: 'message' | 'none'  // 错误提示方式
-	// withToken?: boolean                     // 是否携带 token
-	// retryCount?: number                     // 重试次数
+	/**
+	 * 是否忽略取消 token（不取消重复请求）
+	 * - false（默认）：自动取消重复请求
+	 * - true：不取消重复请求
+	 */
+	ignoreCancelToken?: boolean
+
+	/**
+	 * 是否显示提示信息
+	 * - true（默认）：显示错误/成功提示
+	 * - false：不显示提示
+	 */
+	isShowMessage?: boolean
+
+	/**
+	 * 是否显示成功信息
+	 * - false（默认）：不显示成功提示
+	 * - true：显示成功提示（会使用响应中的 msg/message 或默认消息）
+	 *
+	 * @example
+	 * ```ts
+	 * // 启用成功提示
+	 * http.post('/api/user', data, {
+	 *   isShowSuccessMessage: true
+	 * })
+	 * ```
+	 */
+	isShowSuccessMessage?: boolean
+
+	/**
+	 * 是否显示失败信息
+	 * - true（默认）：显示失败提示
+	 * - false：不显示失败提示
+	 */
+	isShowErrorMessage?: boolean
+
+	/**
+	 * 错误消息提示类型
+	 * - 'toast'（默认）：使用 Toast 提示
+	 * - 'modal'：使用 Modal 弹窗提示
+	 * - 'none'：不显示提示
+	 */
+	errorMessageMode?: 'toast' | 'modal' | 'none'
+
+	/**
+	 * 成功的文本信息（自定义成功提示）
+	 * 如果设置了此参数，即使 isShowSuccessMessage 为 false，也会显示成功提示
+	 *
+	 * @example
+	 * ```ts
+	 * // 自定义成功提示消息
+	 * http.post('/api/user', data, {
+	 *   successMessageText: '保存成功'
+	 * })
+	 *
+	 * // 同时启用并自定义消息
+	 * http.post('/api/user', data, {
+	 *   isShowSuccessMessage: true,
+	 *   successMessageText: '用户信息已更新'
+	 * })
+	 * ```
+	 */
+	successMessageText?: string
+
+	/**
+	 * 错误的文本信息（自定义错误提示）
+	 */
+	errorMessageText?: string
+
+	/**
+	 * 是否携带 token
+	 * - true（默认）：自动携带 token
+	 * - false：不携带 token
+	 */
+	withToken?: boolean
+
+	/**
+	 * 是否添加时间戳（防止 GET 请求缓存）
+	 * - true（默认）：GET 请求自动添加 _t 参数
+	 * - false：不添加时间戳
+	 */
+	joinTime?: boolean
+
+	/**
+	 * 是否格式化请求参数时间
+	 * - true（默认）：自动格式化 Date 对象为字符串
+	 * - false：不格式化
+	 */
+	formatDate?: boolean
+
+	/**
+	 * POST 请求时是否将参数拼接到 URL
+	 * - false（默认）：参数放在请求体中
+	 * - true：参数拼接到 URL
+	 */
+	joinParamsToUrl?: boolean
+
+	/**
+	 * 接口地址（可覆盖默认 baseURL）
+	 */
+	apiUrl?: string
+
+	/**
+	 * 请求拼接路径（URL 前缀）
+	 */
+	urlPrefix?: string
+
+	/**
+	 * 是否加入 URL 前缀
+	 * - true（默认）：自动添加 urlPrefix
+	 * - false：不添加前缀
+	 */
+	joinPrefix?: boolean
 }
 
 /**

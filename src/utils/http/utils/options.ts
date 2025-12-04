@@ -12,10 +12,20 @@ import type { RequestOptions } from '../types'
 const CUSTOM_OPTION_KEYS: (keyof RequestOptions)[] = [
 	'isReturnNativeResponse',
 	'skipErrorHandler',
-	// 示例：添加新参数时，取消注释并添加键名
-	// 'errorMessageMode',
-	// 'withToken',
-	// 'retryCount',
+	'ignoreCancelToken',
+	'isShowMessage',
+	'isShowSuccessMessage',
+	'isShowErrorMessage',
+	'errorMessageMode',
+	'successMessageText',
+	'errorMessageText',
+	'withToken',
+	'joinTime',
+	'formatDate',
+	'joinParamsToUrl',
+	'apiUrl',
+	'urlPrefix',
+	'joinPrefix',
 ]
 
 /**
@@ -49,5 +59,15 @@ export function getDefaultOptions(): RequestOptions {
 	return {
 		isReturnNativeResponse: false,
 		skipErrorHandler: false, // 默认进行 code 校验，统一错误处理
+		ignoreCancelToken: false, // 默认取消重复请求
+		isShowMessage: true, // 默认显示提示信息
+		isShowSuccessMessage: false, // 默认不显示成功提示
+		isShowErrorMessage: true, // 默认显示失败提示
+		errorMessageMode: 'toast', // 默认使用 Toast 提示
+		withToken: true, // 默认携带 token
+		joinTime: true, // 默认添加时间戳
+		formatDate: true, // 默认格式化时间
+		joinParamsToUrl: false, // 默认不拼接参数到 URL
+		joinPrefix: true, // 默认添加 URL 前缀
 	}
 }

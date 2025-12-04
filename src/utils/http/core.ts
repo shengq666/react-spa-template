@@ -4,6 +4,8 @@ import axios from 'axios'
 import { requestErrorInterceptor, requestInterceptor } from './interceptors/request'
 import { transformError } from './transform/error'
 import { transformResponse } from './transform/response'
+import { AxiosCanceler } from './utils/cancel'
+import { extractCustomOptions } from './utils/options'
 
 /**
  * 创建 HTTP 请求实例的工厂函数
@@ -24,11 +26,39 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	// 创建 axios 实例
 	const instance: AxiosInstance = axios.create(baseConfig)
 
-	// 注册请求拦截器
-	instance.interceptors.request.use(requestInterceptor, requestErrorInterceptor)
+	// 创建请求取消管理器实例（每个实例独立管理）
+	const axiosCanceler = new AxiosCanceler()
+
+	// 注册请求拦截器（使用闭包访问 axiosCanceler）
+	instance.interceptors.request.use(config => {
+		const httpConfig = config as HttpRequestConfig
+		const requestOptions = httpConfig.requestOptions
+		const options = extractCustomOptions(requestOptions)
+
+		// 请求取消处理
+		const ignoreCancel = options.ignoreCancelToken !== undefined ? options.ignoreCancelToken : false
+		if (!ignoreCancel) {
+			axiosCanceler.addPending(config)
+		}
+
+		return requestInterceptor(config)
+	}, requestErrorInterceptor)
 
 	// 注册响应拦截器
-	instance.interceptors.response.use(transformResponse, transformError)
+	instance.interceptors.response.use(
+		response => {
+			// 请求成功，移除取消标记
+			axiosCanceler.removePending(response.config)
+			return transformResponse(response)
+		},
+		error => {
+			// 请求失败，移除取消标记
+			if (error.config) {
+				axiosCanceler.removePending(error.config)
+			}
+			return transformError(error)
+		},
+	)
 
 	/**
 	 * 核心请求方法
@@ -85,7 +115,22 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 			requestOptions = undefined
 		} else if (
 			optionsOrConfig &&
-			('isReturnNativeResponse' in optionsOrConfig || 'skipErrorHandler' in optionsOrConfig)
+			('isReturnNativeResponse' in optionsOrConfig ||
+				'skipErrorHandler' in optionsOrConfig ||
+				'ignoreCancelToken' in optionsOrConfig ||
+				'isShowMessage' in optionsOrConfig ||
+				'isShowSuccessMessage' in optionsOrConfig ||
+				'isShowErrorMessage' in optionsOrConfig ||
+				'errorMessageMode' in optionsOrConfig ||
+				'successMessageText' in optionsOrConfig ||
+				'errorMessageText' in optionsOrConfig ||
+				'withToken' in optionsOrConfig ||
+				'joinTime' in optionsOrConfig ||
+				'formatDate' in optionsOrConfig ||
+				'joinParamsToUrl' in optionsOrConfig ||
+				'apiUrl' in optionsOrConfig ||
+				'urlPrefix' in optionsOrConfig ||
+				'joinPrefix' in optionsOrConfig)
 		) {
 			// 方式：request(config, options) - 第二个参数是 RequestOptions
 			axiosConfig = configOrUrl

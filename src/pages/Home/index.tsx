@@ -15,11 +15,18 @@ interface ListItem {
 	viewCount: number
 }
 function getHomePageBannerList(params: any) {
-	return http.request({
-		url: '/api/galleryService/bannerInfo/getHomePageBannerList',
-		method: 'get',
-		params,
-	})
+	return http.request(
+		{
+			url: '/api/galleryService/bannerInfo/getHomePageBannerList',
+			method: 'get',
+			params,
+		},
+		{
+			// 示例：显示成功提示
+			isShowSuccessMessage: true, // 启用成功提示（使用默认消息或响应中的消息）
+			successMessageText: '获取成功', // 或者自定义成功提示消息
+		},
+	)
 }
 export default function Home() {
 	const navigate = useNavigate()
