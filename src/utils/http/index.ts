@@ -1,6 +1,9 @@
 import { API_CONFIG } from '@/constants'
 import { createHttp } from './core'
 
+// 导出常量
+export { codeMessage, ResponseCode } from './constants'
+
 // 导出类型
 export type { BasicResponse, HttpRequestConfig, RequestOptions } from './types'
 

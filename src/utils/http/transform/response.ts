@@ -2,6 +2,7 @@ import type { AxiosResponse } from 'axios'
 import type { BasicResponse, HttpRequestConfig } from '../types'
 import { STORAGE_KEYS } from '@/constants'
 import { storage } from '../../storage'
+import { codeMessage, ResponseCode } from '../constants'
 import { extractCustomOptions } from '../utils/options'
 
 /**
@@ -39,18 +40,12 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 
 		// skipErrorHandler: false（默认）- 进行 code 校验，code !== 200 会抛出错误（统一错误处理）
 		// 请求成功
-		if (codeValue === 200) {
+		if (codeValue === ResponseCode.SUCCESS) {
 			return res
 		}
 
-		// 401 特殊处理：token 过期或无效，需要清除本地 token
-		if (codeValue === 401) {
-			handle401Error()
-		}
-
-		// 接口请求错误，统一提示错误信息
-		const errorMsg = (res as any).msg || (res as any).message || '请求失败'
-		throw new Error(errorMsg)
+		// 接口请求错误，统一处理（参照 Ant Design Pro）
+		handleBusinessError(codeValue, res)
 	}
 
 	// 非标准业务响应，直接透传 data
@@ -58,11 +53,50 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 }
 
 /**
+ * 处理业务错误（参照 Ant Design Pro 的实现方式）
+ */
+function handleBusinessError(code: number, res: any): never {
+	let errorMsg = res.msg || res.message || codeMessage[code] || '请求失败'
+
+	// 根据不同的 code 进行特殊处理
+	switch (code) {
+		case ResponseCode.TOKEN_EXPIRED:
+			// Token 过期或无效，清除本地 token 并跳转登录
+			handle401Error()
+			errorMsg = codeMessage[ResponseCode.TOKEN_EXPIRED] || errorMsg
+			break
+
+		case ResponseCode.FORBIDDEN:
+			// 无权限访问
+			errorMsg = codeMessage[ResponseCode.FORBIDDEN] || errorMsg
+			break
+
+		case ResponseCode.NOT_FOUND:
+			// 请求地址不存在
+			errorMsg = codeMessage[ResponseCode.NOT_FOUND] || errorMsg
+			break
+
+		case ResponseCode.ERROR:
+			// 服务器内部错误
+			errorMsg = codeMessage[ResponseCode.ERROR] || errorMsg
+			break
+
+		default:
+			// 其他错误码，使用返回的错误信息
+			break
+	}
+
+	throw new Error(errorMsg)
+}
+
+/**
  * 处理 401 错误（token 过期或无效）
+ * 参照 Ant Design Pro：清除本地存储并跳转登录页
  */
 function handle401Error(): void {
 	storage.remove(STORAGE_KEYS.TOKEN)
 	storage.remove(STORAGE_KEYS.USER_INFO)
-	// TODO: 可以根据实际情况在这里跳转
+	// 跳转到登录页（参照 Ant Design Pro：清除存储后跳转登录）
+	// 注意：这里使用 window.location.href 而不是路由跳转，因为需要完全刷新页面
 	// window.location.href = '/#/login'
 }
