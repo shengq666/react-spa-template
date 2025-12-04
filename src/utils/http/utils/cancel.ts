@@ -14,7 +14,7 @@ export function getPendingUrl(config: AxiosRequestConfig): string {
 }
 
 /**
- * 请求取消管理器（参照 kuka-img-pad 和 Ant Design Pro）
+ * 请求取消管理器（参照 Ant Design Pro）
  * 每个实例独立管理自己的请求
  */
 export class AxiosCanceler {

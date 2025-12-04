@@ -3,9 +3,7 @@ import type { BasicResponse, HttpRequestConfig } from '../types'
 import { codeMessage, ResponseCode } from '../constants'
 import { extractCustomOptions, handle401Error, showErrorMessage, showSuccessMessage } from '../utils'
 
-/**
- * 处理成功响应
- */
+/** 处理成功响应：统一 code 校验与消息提示 */
 export function transformResponse<T = any>(response: AxiosResponse<T>): T | AxiosResponse<T> {
 	const config = response.config as HttpRequestConfig
 	const requestOptions = config.requestOptions
@@ -16,39 +14,26 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 		return response
 	}
 
-	// 默认情况下，只返回响应体（response.data），不包含响应头等信息
-
 	const res = response.data as BasicResponse | any
 
 	if (!res) {
 		throw new Error('请求出错，请稍候重试')
 	}
-	// 默认返回完整响应体（包含 code、data、message）
-	// 标准业务响应：包含 code / data / message 字段
 	if (res && typeof res === 'object' && 'code' in res) {
-		// 处理 code 可能是字符串或数字的情况（如 "200" 或 200）
 		const codeValue = typeof res.code === 'string' ? Number(res.code) : res.code
 
-		// skipErrorHandler: true - 跳过错误处理，返回完整响应体，让业务代码自己判断 code
-		// 用于业务代码需要根据 code 做不同处理的场景（如：code 10086 表示已领取，需要展示已领取的券）
 		if (options.skipErrorHandler) {
 			return res
 		}
 
-		// skipErrorHandler: false（默认）- 进行 code 校验，code !== 200 会抛出错误（统一错误处理）
-		// 请求成功
 		if (codeValue === ResponseCode.SUCCESS) {
-			// 显示成功提示（如果需要）
 			showSuccessMessage(options, res, 'response')
 			return res
 		}
 
-		// 接口请求错误，统一处理（参照 Ant Design Pro）
 		handleBusinessError(codeValue, res, options)
 	}
 
-	// 非标准业务响应（没有 code 字段），也显示成功提示（如果需要）
-	// 因为这种情况下通常表示请求成功，只是响应格式不同
 	if (options.isShowSuccessMessage || options.successMessageText) {
 		showSuccessMessage(options, res, 'response')
 	}

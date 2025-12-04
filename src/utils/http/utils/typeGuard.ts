@@ -5,7 +5,7 @@ import { AXIOS_CONFIG_KEYS, CUSTOM_OPTION_KEYS } from './options'
  * 判断对象是否是 RequestOptions
  * 使用类型守卫函数，动态检查 CUSTOM_OPTION_KEYS
  *
- * 参照 kuka-img-pad 和 Ant Design Pro 的实现方式：
+ * 参照 Ant Design Pro 的实现方式：
  * - 优先检查是否包含 RequestOptions 特有的字段
  * - 如果包含 RequestOptions 字段且不包含 axios 配置字段，则认为是 RequestOptions
  * - 如果同时包含两者，比较字段数量，RequestOptions 字段更多或相等则认为是 RequestOptions
@@ -51,7 +51,7 @@ export function isRequestOptions(obj: any): obj is RequestOptions {
 
 		// 如果 RequestOptions 字段更多或相等，则认为是 RequestOptions（优先考虑 RequestOptions）
 		// 这样可以确保即使用户在 RequestOptions 中混入了一些 axios 参数，也能正确识别
-		// 参照 kuka-img-pad：RequestOptions 更特殊，应该优先识别
+		// 参照 Ant Design Pro：RequestOptions 更特殊，应该优先识别
 		return requestOptionKeyCount >= axiosKeyCount
 	}
 

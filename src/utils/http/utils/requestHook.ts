@@ -4,7 +4,7 @@ import { isString } from '@/utils/is'
 import { formatRequestDate, isUrl, joinTimestamp, setObjToUrlParams } from './helper'
 
 /**
- * 请求前的钩子处理（参照 kuka-img-pad）
+ * 请求前的钩子处理
  * 处理 URL 前缀、参数格式化、时间戳等
  */
 export function beforeRequestHook(config: AxiosRequestConfig, options: RequestOptions): AxiosRequestConfig {
