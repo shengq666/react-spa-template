@@ -1,9 +1,9 @@
-import type { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
+import type { AxiosInstance, AxiosRequestConfig } from 'axios'
 import type { HttpRequestConfig, RequestOptions } from './types'
 import axios from 'axios'
-import { STORAGE_KEYS } from '@/constants'
-import { storage } from '../storage'
-import { transformError, transformResponse } from './transform'
+import { requestErrorInterceptor, requestInterceptor } from './interceptors/request'
+import { transformError } from './transform/error'
+import { transformResponse } from './transform/response'
 
 /**
  * 创建 HTTP 请求实例的工厂函数
@@ -24,34 +24,10 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	// 创建 axios 实例
 	const instance: AxiosInstance = axios.create(baseConfig)
 
-	// 请求拦截器
-	instance.interceptors.request.use(
-		config => {
-			// 添加 token
-			const token = storage.get<string>(STORAGE_KEYS.TOKEN)
-			if (token && config.headers) {
-				config.headers.Authorization = `Bearer ${token}`
-			}
+	// 注册请求拦截器
+	instance.interceptors.request.use(requestInterceptor, requestErrorInterceptor)
 
-			// 支持 FormData：当请求数据是 FormData 时，自动处理 Content-Type
-			// FormData 需要浏览器自动设置 boundary，所以删除 Content-Type 让浏览器自动设置
-			if (config.data instanceof FormData) {
-				if (config.headers) {
-					// 删除 Content-Type，让浏览器自动设置（包含 boundary）
-					delete config.headers['Content-Type']
-					delete config.headers['content-type']
-				}
-			}
-
-			return config
-		},
-		(error: AxiosError) => {
-			console.error('Request error:', error)
-			return Promise.reject(error)
-		},
-	)
-
-	// 响应拦截器
+	// 注册响应拦截器
 	instance.interceptors.response.use(transformResponse, transformError)
 
 	/**
