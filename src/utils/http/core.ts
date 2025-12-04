@@ -282,5 +282,11 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	// 暴露底层 axios 实例，方便取消请求、额外拦截器等极端场景
 	;(request as any).client = instance
 
-	return request as typeof request & { client: AxiosInstance }
+	// 将 request 方法挂载到对象上，支持 http.request() 调用方式
+	const httpInstance = Object.assign(request, {
+		request,
+		client: instance,
+	})
+
+	return httpInstance as typeof request & { request: typeof request; client: AxiosInstance }
 }
