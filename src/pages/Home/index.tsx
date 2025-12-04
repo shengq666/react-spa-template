@@ -22,7 +22,7 @@ function getHomePageBannerList(params: any) {
 			params,
 		},
 		{
-			// 示例：显示成功提示
+			// // 示例：显示成功提示
 			isShowSuccessMessage: true, // 启用成功提示（使用默认消息或响应中的消息）
 			successMessageText: '获取成功', // 或者自定义成功提示消息
 		},

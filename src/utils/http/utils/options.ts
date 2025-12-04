@@ -108,7 +108,10 @@ export function getDefaultOptions(): RequestOptions {
 		isReturnNativeResponse: false,
 		skipErrorHandler: false, // 默认进行 code 校验，统一错误处理
 		ignoreCancelToken: false, // 默认取消重复请求
-		isShowMessage: true, // 默认显示提示信息
+		// 参照业界/Ant Design Pro 习惯：
+		// 默认不在 HTTP 层弹出成功/失败提示，而是由业务层按需开启
+		// 这样进入页面时的一堆初始化请求不会干扰用户体验
+		isShowMessage: true, // 默认不显示提示信息，需要时在单个请求上显式开启
 		isShowSuccessMessage: false, // 默认不显示成功提示
 		isShowErrorMessage: true, // 默认显示失败提示
 		errorMessageMode: 'toast', // 默认使用 Toast 提示
