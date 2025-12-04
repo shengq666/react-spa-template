@@ -23,16 +23,16 @@ export default defineConfig({
 	server: {
 		port: 3000,
 		open: true,
+		proxy: {
+			'/api': {
+				target: 'https://qkrelease.kukahome.com',
+				changeOrigin: true,
+			},
+		},
 	},
 	preview: {
 		port: 4173,
 		open: true,
-		proxy: {
-			'/api': {
-				target: 'https://qkrelease.kukahome.com/',
-				changeOrigin: true,
-			},
-		},
 		// 由于构建后的HTML在dist/entry/index.html,需要指定正确的入口
 		// 注意:preview模式下,Vite会自动处理路径,但需要确保base配置正确
 		// open: '/entry/index.html', //指定预览入口文件

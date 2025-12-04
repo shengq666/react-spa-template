@@ -7,7 +7,9 @@ export const APP_CONFIG = {
 
 // API 配置
 export const API_CONFIG = {
-	baseURL: import.meta.env.VITE_API_BASE_URL || '',
+	// 开发环境下，如果设置了完整 URL，需要设置为空以使用 Vite 代理
+	// 生产环境下，使用环境变量中的 baseURL
+	baseURL: '',
 	timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
 }
 

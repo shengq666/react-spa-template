@@ -16,7 +16,7 @@ interface ListItem {
 }
 function getHomePageBannerList(params: any) {
 	return http.request({
-		url: 'https://qkrelease.kukahome.com/api/galleryService/bannerInfo/getHomePageBannerList',
+		url: '/api/galleryService/bannerInfo/getHomePageBannerList',
 		method: 'get',
 		params,
 	})
@@ -28,8 +28,12 @@ export default function Home() {
 	const [currentTime, setCurrentTime] = useState(new Date())
 
 	const testHttp = async () => {
-		const result = await getHomePageBannerList({ displayLocation: 2, configId: 10, guideId: 1155073, type: 3 })
-		console.log('======result', result)
+		try {
+			const result = await getHomePageBannerList({ displayLocation: 2, configId: 10, guideId: 1155073, type: 3 })
+			console.warn('======result', result)
+		} catch (error: any) {
+			console.error('======error', error)
+		}
 	}
 
 	useEffect(() => {
