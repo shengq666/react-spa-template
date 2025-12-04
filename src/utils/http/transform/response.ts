@@ -1,10 +1,7 @@
 import type { AxiosResponse } from 'axios'
 import type { BasicResponse, HttpRequestConfig } from '../types'
-import { Toast } from 'antd-mobile'
-import { STORAGE_KEYS } from '@/constants'
-import { storage } from '../../storage'
 import { codeMessage, ResponseCode } from '../constants'
-import { extractCustomOptions } from '../utils/options'
+import { extractCustomOptions, handle401Error, showErrorMessage, showSuccessMessage } from '../utils'
 
 /**
  * 处理成功响应
@@ -42,7 +39,7 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 		// 请求成功
 		if (codeValue === ResponseCode.SUCCESS) {
 			// 显示成功提示（如果需要）
-			showSuccessMessage(options, res)
+			showSuccessMessage(options, res, 'response')
 			return res
 		}
 
@@ -53,63 +50,11 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 	// 非标准业务响应（没有 code 字段），也显示成功提示（如果需要）
 	// 因为这种情况下通常表示请求成功，只是响应格式不同
 	if (options.isShowSuccessMessage || options.successMessageText) {
-		showSuccessMessage(options, res)
+		showSuccessMessage(options, res, 'response')
 	}
 
 	// 非标准业务响应，直接透传 data
 	return res
-}
-
-/**
- * 显示成功提示
- *
- * @example
- * ```ts
- * // 方式1: 启用成功提示（使用默认消息或响应中的消息）
- * http.post('/api/user', data, {
- *   isShowSuccessMessage: true
- * })
- *
- * // 方式2: 自定义成功提示消息
- * http.post('/api/user', data, {
- *   successMessageText: '保存成功'
- * })
- *
- * // 方式3: 同时启用并自定义消息
- * http.post('/api/user', data, {
- *   isShowSuccessMessage: true,
- *   successMessageText: '用户信息已更新'
- * })
- * ```
- */
-function showSuccessMessage(options: any, res: any): void {
-	// 如果全局禁用了消息提示，直接返回
-	if (options.isShowMessage === false) {
-		return
-	}
-
-	// 如果设置了 isShowSuccessMessage: true 或者提供了 successMessageText，则显示成功提示
-	if (options.isShowSuccessMessage || options.successMessageText) {
-		// 优先级：successMessageText > res.msg > res.message > 默认消息
-		const message = options.successMessageText || res?.msg || res?.message || '操作成功'
-
-		// 调试信息（开发环境）
-		if (import.meta.env.DEV) {
-			// eslint-disable-next-line no-console
-			console.log('[Success Message]', {
-				isShowMessage: options.isShowMessage,
-				isShowSuccessMessage: options.isShowSuccessMessage,
-				successMessageText: options.successMessageText,
-				message,
-				res,
-			})
-		}
-
-		Toast.show({
-			icon: 'success',
-			content: message,
-		})
-	}
 }
 
 /**
@@ -146,57 +91,8 @@ function handleBusinessError(code: number, res: any, options: any): never {
 			break
 	}
 
-	// 显示错误提示
-	showErrorMessage(options, errorMsg)
+	// 显示错误提示（使用通用的消息处理函数）
+	showErrorMessage(options, errorMsg, 'business-error')
 
 	throw new Error(errorMsg)
-}
-
-/**
- * 显示错误提示
- */
-function showErrorMessage(options: any, errorMsg: string): void {
-	if (!options.isShowMessage || !options.isShowErrorMessage) {
-		return
-	}
-
-	const message = options.errorMessageText || errorMsg
-
-	// 根据 errorMessageMode 选择提示方式
-	switch (options.errorMessageMode) {
-		case 'modal':
-			// 使用 Modal 弹窗（antd-mobile 使用 Dialog）
-			// 这里暂时使用 Toast，如果需要 Modal 可以后续添加
-			Toast.show({
-				icon: 'fail',
-				content: message,
-				duration: 3000,
-			})
-			break
-
-		case 'none':
-			// 不显示提示
-			break
-
-		case 'toast':
-		default:
-			// 默认使用 Toast
-			Toast.show({
-				icon: 'fail',
-				content: message,
-			})
-			break
-	}
-}
-
-/**
- * 处理 401 错误（token 过期或无效）
- * 参照 Ant Design Pro：清除本地存储并跳转登录页
- */
-function handle401Error(): void {
-	storage.remove(STORAGE_KEYS.TOKEN)
-	storage.remove(STORAGE_KEYS.USER_INFO)
-	// 跳转到登录页（参照 Ant Design Pro：清除存储后跳转登录）
-	// 注意：这里使用 window.location.href 而不是路由跳转，因为需要完全刷新页面
-	// window.location.href = '/#/login'
 }

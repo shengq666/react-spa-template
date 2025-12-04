@@ -1,10 +1,8 @@
 import type { AxiosError } from 'axios'
 import type { HttpRequestConfig } from '../types'
 import axios from 'axios'
-import { STORAGE_KEYS } from '@/constants'
-import { storage } from '../../storage'
 import { codeMessage, ResponseCode } from '../constants'
-import { extractCustomOptions } from '../utils/options'
+import { extractCustomOptions, handle401Error, showErrorMessage } from '../utils'
 
 /**
  * 处理错误响应
@@ -55,12 +53,12 @@ function convertToBusinessError(error: AxiosError, options: any): Error {
 			handle401Error()
 		}
 
-		// 显示错误提示（如果需要）
-		showErrorMessage(options, message)
+		// 显示错误提示（使用通用的消息处理函数）
+		showErrorMessage(options, message, 'http-error')
 	} else if (error.request) {
 		message = '网络连接超时'
-		// 显示错误提示（如果需要）
-		showErrorMessage(options, message)
+		// 显示错误提示（使用通用的消息处理函数）
+		showErrorMessage(options, message, 'network-error')
 	}
 
 	return new Error(message)
@@ -78,29 +76,4 @@ function getErrorMessageByStatus(status: number): string {
 
 	// 如果没有映射，返回默认错误信息
 	return `连接错误${status}`
-}
-
-/**
- * 显示错误提示
- * 注意：HTTP 错误（如 401, 404）的错误提示应该在业务代码中处理
- * 这里只负责转换错误，不直接显示 Toast（保持模块化）
- */
-function showErrorMessage(options: any, errorMsg: string): void {
-	// HTTP 错误不应该在这里显示 Toast，应该在业务代码的 catch 中处理
-	// 这里只做日志记录（如果需要）
-	if (import.meta.env.DEV) {
-		console.warn('[HTTP Error]', {
-			message: errorMsg,
-			options,
-		})
-	}
-}
-
-/**
- * 处理 401 错误（token 过期或无效）
- */
-function handle401Error(): void {
-	storage.remove(STORAGE_KEYS.TOKEN)
-	storage.remove(STORAGE_KEYS.USER_INFO)
-	window.location.href = '/#/login'
 }
