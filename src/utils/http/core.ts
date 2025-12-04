@@ -66,8 +66,7 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	 *   },
 	 *   {
 	 *     isReturnNativeResponse: true,
-	 *     isTransformResponse: false,
-	 *     errorHandling: 'manual'  // 手动处理错误
+	 *     isTransformResponse: true // 开启业务 code 校验，成功时返回 data
 	 *   }
 	 * )
 	 * ```
@@ -86,9 +85,7 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 			requestOptions = undefined
 		} else if (
 			optionsOrConfig &&
-			('isReturnNativeResponse' in optionsOrConfig ||
-				'isTransformResponse' in optionsOrConfig ||
-				'errorHandling' in optionsOrConfig)
+			('isReturnNativeResponse' in optionsOrConfig || 'isTransformResponse' in optionsOrConfig)
 		) {
 			// 方式：request(config, options) - 第二个参数是 RequestOptions
 			axiosConfig = configOrUrl
@@ -126,8 +123,7 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	 *   '/api/user',
 	 *   { params: { id: 1 }, timeout: 3000 },  // axios 配置
 	 *   {
-	 *     isTransformResponse: false,           // 返回完整响应体，业务代码自己判断 code
-	 *     errorHandling: 'manual'              // 手动处理错误，业务代码自己 catch
+	 *     isTransformResponse: true  // 开启 code 校验，成功时返回 data
 	 *   }
 	 * ).then(result => {
 	 *   // result = { code: 10086, msg: '已经领取', data: { list: [...] } }
@@ -176,7 +172,7 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	 *   '/api/user',
 	 *   { name: 'John' },                                    // 请求体
 	 *   { timeout: 5000, headers: { 'Content-Type': 'application/json' } }, // axios 配置
-	 *   { isReturnNativeResponse: true, errorHandling: 'manual' }            // 自定义选项
+	 *   { isReturnNativeResponse: true }            // 自定义选项
 	 * )
 	 * ```
 	 */

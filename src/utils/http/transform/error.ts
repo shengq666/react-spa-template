@@ -1,28 +1,12 @@
 import type { AxiosError } from 'axios'
-import type { HttpRequestConfig } from '../types'
 import { STORAGE_KEYS } from '@/constants'
 import { storage } from '../../storage'
-import { extractCustomOptions } from '../utils/options'
 
 /**
  * 处理错误响应
- *
- * 根据 errorHandling 参数决定错误处理方式：
- * - 'auto'（默认）：统一处理错误，自动显示错误信息、处理登录跳转等
- * - 'manual'：不进行任何处理，直接抛出原始 AxiosError，由业务代码自己 catch 处理
+ * 统一处理错误，自动转换错误信息、处理登录跳转等
  */
 export function transformError(error: AxiosError): Promise<never> {
-	const config = error.config as HttpRequestConfig | undefined
-	const requestOptions = config?.requestOptions
-	const options = extractCustomOptions(requestOptions)
-
-	// 如果设置为手动处理，直接抛出原始错误，不做任何统一处理
-	// 业务代码可以自己 catch 并决定如何处理（如显示自定义错误提示、特殊跳转等）
-	if (options.errorHandling === 'manual') {
-		return Promise.reject(error)
-	}
-
-	// 自动处理错误（默认行为）
 	// 统一处理错误：转换错误信息、处理登录跳转等
 	return Promise.reject(convertToBusinessError(error))
 }
