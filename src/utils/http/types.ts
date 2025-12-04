@@ -55,15 +55,21 @@ export interface RequestOptions {
 	isReturnNativeResponse?: boolean
 
 	/**
-	 * 是否按约定格式 (code/data/message) 进行处理
-	 * - false（默认）：不进行任何处理，直接返回 response.data（包含 code、message、data），用于页面代码可能需要直接获取 code，data，message 这些信息时使用
-	 * - true：按 BasicResponse 约定做 code 校验，code !== 200 会抛出错误，成功时返回业务 data
+	 * 是否跳过错误处理（参照 Ant Design Pro 的 skipErrorHandler）
+	 * - false（默认）：进行 code 校验，code !== 200 会抛出错误（统一错误处理），成功时返回完整响应体
+	 * - true：跳过错误处理，返回完整响应体（包含 code、data、message），让业务代码自己判断 code
+	 *   用于业务代码需要根据 code 做不同处理的场景（如：code 10086 表示已领取，需要展示已领取的券）
 	 *
 	 * @example
 	 * ```ts
-	 * // 默认行为：返回完整响应体，业务代码自己判断
+	 * // 默认行为：进行 code 校验，code !== 200 会抛出错误
+	 * const result = await http.get('/api/user')
+	 * // 如果 code !== 200，会抛出错误
+	 * // 如果 code === 200，返回完整响应体：{ code: 200, data: {...}, msg: 'OK' }
+	 *
+	 * // 跳过错误处理：返回完整响应体，业务代码自己判断
 	 * const result = await http.get('/api/coupon', {}, {
-	 *   // 不传或传 false：返回 { code, data, message }
+	 *   skipErrorHandler: true
 	 * })
 	 * // result = { code: 10086, msg: '已经领取', data: { list: [...] } }
 	 * if (result.code === 10086) {
@@ -73,13 +79,9 @@ export interface RequestOptions {
 	 *   // 正常领取成功
 	 *   showSuccess()
 	 * }
-	 *
-	 * // 开启转换：按约定格式处理，code !== 200 会抛出错误
-	 * const data = await http.get('/api/coupon', {}, { isTransformResponse: true })
-	 * // data = 实际业务数据（不再包含 code、message）
 	 * ```
 	 */
-	isTransformResponse?: boolean
+	skipErrorHandler?: boolean
 
 	// 未来可以在这里添加更多自定义参数，例如：
 	// errorMessageMode?: 'message' | 'none'  // 错误提示方式

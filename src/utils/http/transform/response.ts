@@ -21,25 +21,26 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 
 	const res = response.data as BasicResponse | any
 
-	// 2. isTransformResponse: false（默认）- 不进行任何处理，直接返回
-	// 用于页面代码可能需要直接获取 code，data，message 这些信息时使用
-	if (!options.isTransformResponse) {
-		return res
-	}
-
-	// 3. isTransformResponse: true - 进行 code 校验，code !== 200 会抛出错误
 	if (!res) {
 		throw new Error('请求出错，请稍候重试')
 	}
 
+	// 默认返回完整响应体（包含 code、data、message）
 	// 标准业务响应：包含 code / data / message 字段
 	if (res && typeof res === 'object' && 'code' in res) {
 		// 处理 code 可能是字符串或数字的情况（如 "200" 或 200）
 		const codeValue = typeof res.code === 'string' ? Number(res.code) : res.code
 
+		// skipErrorHandler: true - 跳过错误处理，返回完整响应体，让业务代码自己判断 code
+		// 用于业务代码需要根据 code 做不同处理的场景（如：code 10086 表示已领取，需要展示已领取的券）
+		if (options.skipErrorHandler) {
+			return res
+		}
+
+		// skipErrorHandler: false（默认）- 进行 code 校验，code !== 200 会抛出错误（统一错误处理）
 		// 请求成功
 		if (codeValue === 200) {
-			return res.data
+			return res
 		}
 
 		// 401 特殊处理：token 过期或无效，需要清除本地 token
@@ -52,7 +53,7 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 		throw new Error(errorMsg)
 	}
 
-	// 4. 非标准业务响应，直接透传 data
+	// 非标准业务响应，直接透传 data
 	return res
 }
 

@@ -11,7 +11,7 @@ import type { RequestOptions } from '../types'
  */
 const CUSTOM_OPTION_KEYS: (keyof RequestOptions)[] = [
 	'isReturnNativeResponse',
-	'isTransformResponse',
+	'skipErrorHandler',
 	// 示例：添加新参数时，取消注释并添加键名
 	// 'errorMessageMode',
 	// 'withToken',
@@ -48,6 +48,6 @@ export function extractCustomOptions(requestOptions?: RequestOptions): RequestOp
 export function getDefaultOptions(): RequestOptions {
 	return {
 		isReturnNativeResponse: false,
-		isTransformResponse: false,
+		skipErrorHandler: false, // 默认进行 code 校验，统一错误处理
 	}
 }

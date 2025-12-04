@@ -66,7 +66,7 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	 *   },
 	 *   {
 	 *     isReturnNativeResponse: true,
-	 *     isTransformResponse: true // 开启业务 code 校验，成功时返回 data
+	 *     skipErrorHandler: false // 进行 code 校验，code !== 200 会抛出错误
 	 *   }
 	 * )
 	 * ```
@@ -85,7 +85,7 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 			requestOptions = undefined
 		} else if (
 			optionsOrConfig &&
-			('isReturnNativeResponse' in optionsOrConfig || 'isTransformResponse' in optionsOrConfig)
+			('isReturnNativeResponse' in optionsOrConfig || 'skipErrorHandler' in optionsOrConfig)
 		) {
 			// 方式：request(config, options) - 第二个参数是 RequestOptions
 			axiosConfig = configOrUrl
@@ -119,22 +119,33 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	 * })
 	 *
 	 * // 带自定义选项（两个参数）
+	 * // 场景1：跳过错误处理，业务代码自己判断 code
 	 * http.get(
-	 *   '/api/user',
-	 *   { params: { id: 1 }, timeout: 3000 },  // axios 配置
+	 *   '/api/coupon',
+	 *   { params: { id: 1 } },  // axios 配置
 	 *   {
-	 *     isTransformResponse: true  // 开启 code 校验，成功时返回 data
+	 *     skipErrorHandler: true  // 跳过错误处理，返回完整响应体
 	 *   }
 	 * ).then(result => {
 	 *   // result = { code: 10086, msg: '已经领取', data: { list: [...] } }
 	 *   // 业务代码可以根据 code 判断业务状态
 	 *   if (result.code === 10086) {
-	 *     showCouponList(result.data.list)
+	 *     showCouponList(result.data.list) // 展示已领取的券
+	 *   } else if (result.code === 200) {
+	 *     showSuccess() // 正常领取成功
 	 *   }
-	 * }).catch(err => {
-	 *   // err 是原始的 AxiosError，可以访问 err.response、err.request 等
-	 *   // 业务代码可以自己决定如何处理错误
 	 * })
+	 *
+	 * // 场景2：统一错误处理（默认），code !== 200 会抛出错误
+	 * http.get('/api/user', { params: { id: 1 } })
+	 *   .then(result => {
+	 *     // 如果 code !== 200，不会执行到这里，会进入 catch
+	 *     // result = { code: 200, data: {...}, msg: 'OK' }
+	 *   })
+	 *   .catch(err => {
+	 *     // err 是 Error 对象，包含错误信息
+	 *     console.error(err.message)
+	 *   })
 	 * ```
 	 */
 	request.get = <T = any>(url: string, config?: AxiosRequestConfig, options?: RequestOptions): Promise<T> => {
