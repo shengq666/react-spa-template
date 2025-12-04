@@ -1,9 +1,11 @@
 import type { AxiosRequestConfig } from 'axios'
 
 export interface BasicResponse<T = any> {
-	code: number
+	code: number | string
 	data: T
-	message: string
+	msg?: string
+	message?: string
+	[key: string]: any
 }
 
 /** 请求行为配置（作为第二个参数传入，用于控制拦截器行为） */
@@ -65,3 +67,21 @@ export interface RequestOptions {
 export interface HttpRequestConfig extends AxiosRequestConfig {
 	requestOptions?: RequestOptions
 }
+
+/** http 实例类型（createHttp 的返回值） */
+export type HttpInstance = ReturnType<typeof import('./core').createHttp>
+
+/** 预设：静默请求（只控制 isShowMessage） */
+export type HttpSilentOptions = Pick<RequestOptions, 'isShowMessage'>
+
+/** 预设：带成功提示的请求 */
+export type HttpSuccessMessageOptions = Pick<
+	RequestOptions,
+	'isShowMessage' | 'isShowSuccessMessage' | 'successMessageText'
+>
+
+/** 预设：带错误提示的请求 */
+export type HttpErrorMessageOptions = Pick<
+	RequestOptions,
+	'isShowMessage' | 'isShowErrorMessage' | 'errorMessageText' | 'errorMessageMode'
+>

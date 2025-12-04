@@ -8,15 +8,30 @@ import { AxiosCanceler } from './utils/cancel'
 import { extractCustomOptions } from './utils/options'
 import { isRequestOptions } from './utils/typeGuard'
 
+export interface CreateHttpConfig extends AxiosRequestConfig {
+	/**
+	 * 实例级默认的 RequestOptions
+	 * - 会与单次请求的 requestOptions 按 `{ ...defaultRequestOptions, ...requestOptions }` 规则合并
+	 * - 单次请求中的配置优先级更高，可覆盖实例默认值
+	 */
+	defaultRequestOptions?: RequestOptions
+}
+
 /** 创建带请求/响应拦截器的 HTTP 实例，可用于多实例场景 */
-export function createHttp(baseConfig?: AxiosRequestConfig) {
-	const instance: AxiosInstance = axios.create(baseConfig)
+export function createHttp(baseConfig?: CreateHttpConfig) {
+	const { defaultRequestOptions, ...axiosBaseConfig } = baseConfig || {}
+	const instance: AxiosInstance = axios.create(axiosBaseConfig)
 	const axiosCanceler = new AxiosCanceler()
 
 	instance.interceptors.request.use(config => {
 		const httpConfig = config as HttpRequestConfig
 		const requestOptions = httpConfig.requestOptions
-		const options = extractCustomOptions(requestOptions)
+		// 实例级 defaultRequestOptions 与 单次请求 requestOptions 合并：
+		// - defaultRequestOptions 作为“全局基线”
+		// - requestOptions 作为“局部覆盖”，优先级更高
+		const mergedRequestOptions =
+			defaultRequestOptions || requestOptions ? { ...defaultRequestOptions, ...requestOptions } : requestOptions
+		const options = extractCustomOptions(mergedRequestOptions)
 
 		// 请求取消处理
 		const ignoreCancel = options.ignoreCancelToken !== undefined ? options.ignoreCancelToken : false

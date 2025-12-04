@@ -5,7 +5,15 @@ import { createHttp } from './core'
 export { codeMessage, ResponseCode } from './constants'
 
 // 导出类型
-export type { BasicResponse, HttpRequestConfig, RequestOptions } from './types'
+export type {
+	BasicResponse,
+	HttpErrorMessageOptions,
+	HttpInstance,
+	HttpRequestConfig,
+	HttpSilentOptions,
+	HttpSuccessMessageOptions,
+	RequestOptions,
+} from './types'
 
 // 导出工厂方法
 export { createHttp }

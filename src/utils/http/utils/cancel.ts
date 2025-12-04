@@ -1,16 +1,41 @@
 import type { AxiosRequestConfig, Canceler } from 'axios'
 import axios from 'axios'
-import { isFunction } from '@/utils/is'
+import { isFunction, isObject } from '@/utils/is'
 
-/**
- * 生成请求的唯一标识（用于请求去重和取消）
- */
+/** 对象稳定序列化：按 key 排序，避免 key 顺序导致的不同字符串 */
+function stableSerialize(value: unknown): string {
+	if (value === undefined || value === null) return ''
+
+	// FormData / File / Blob 等大数据，统一标记，避免庞大字符串
+	if (typeof FormData !== 'undefined' && value instanceof FormData) {
+		return '[form-data]'
+	}
+
+	if (Array.isArray(value)) {
+		return `[${value.map(item => stableSerialize(item)).join(',')}]`
+	}
+
+	if (isObject(value)) {
+		const sortedKeys = Object.keys(value as Record<string, unknown>).sort()
+		const entries = sortedKeys.map(key => `${key}:${stableSerialize((value as any)[key])}`)
+		return `{${entries.join(',')}}`
+	}
+
+	try {
+		return JSON.stringify(value)
+	} catch {
+		return String(value)
+	}
+}
+
+/** 生成请求的唯一标识（用于请求去重和取消） */
 export function getPendingUrl(config: AxiosRequestConfig): string {
 	const { method, url, data, params } = config
-	// 使用 method、url、data、params 生成唯一标识
-	const dataStr = data ? JSON.stringify(data) : ''
-	const paramsStr = params ? JSON.stringify(params) : ''
-	return [method, url, dataStr, paramsStr].join('&')
+	const methodStr = (method || 'get').toLowerCase()
+	const urlStr = url || ''
+	const dataStr = stableSerialize(data)
+	const paramsStr = stableSerialize(params)
+	return [methodStr, urlStr, dataStr, paramsStr].join('&')
 }
 
 /**
