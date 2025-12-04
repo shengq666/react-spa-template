@@ -6,6 +6,7 @@ import { transformError } from './transform/error'
 import { transformResponse } from './transform/response'
 import { AxiosCanceler } from './utils/cancel'
 import { extractCustomOptions } from './utils/options'
+import { isRequestOptions } from './utils/typeGuard'
 
 /**
  * 创建 HTTP 请求实例的工厂函数
@@ -62,44 +63,68 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 
 	/**
 	 * 核心请求方法
-	 * 支持两种调用方式：
-	 * 1. 单个参数：request(config) - 兼容 axios 标准用法
-	 * 2. 两个参数：request(config, options) - 推荐用法，分离 axios 配置和自定义选项
+	 * 完全兼容 axios 的使用习惯，支持所有 axios 原生参数
+	 *
+	 * 参照 kuka-img-pad 和 Ant Design Pro 的实现方式：
+	 * - 当第一个参数是 string 时，第二个参数只能是 AxiosRequestConfig（axios 标准用法）
+	 * - 当第一个参数是 AxiosRequestConfig 时，第二个参数可以是 RequestOptions 或 AxiosRequestConfig
+	 * - 使用类型守卫函数判断第二个参数类型，避免硬编码字段列表
 	 *
 	 * @example
 	 * ```ts
 	 * // 方式1: 单个参数（兼容 axios 标准用法）
+	 * // 所有 axios 文档中的参数都可以使用：url, method, params, data, timeout, headers, etc.
 	 * http.request({
 	 *   url: '/api/user',
 	 *   method: 'get',
 	 *   params: { id: 1 },
-	 *   timeout: 5000
+	 *   timeout: 5000,
+	 *   headers: { 'X-Custom': 'value' },
+	 *   responseType: 'json',
+	 *   // ... 其他所有 axios 支持的参数
 	 * })
 	 *
 	 * // 方式2: URL + 配置对象（兼容 axios 标准用法）
+	 * // 第二个参数是 AxiosRequestConfig，所有 axios 参数都支持
 	 * http.request('/api/user', {
 	 *   method: 'get',
 	 *   params: { id: 1 },
-	 *   timeout: 5000
+	 *   timeout: 5000,
+	 *   headers: { 'X-Custom': 'value' },
+	 *   // ... 其他所有 axios 支持的参数
 	 * })
 	 *
-	 * // 方式3: 两个参数（推荐用法）
-	 * // 第一个参数：所有 axios 原生配置
-	 * // 第二个参数：自定义行为开关（RequestOptions）
+	 * // 方式3: config + RequestOptions（推荐用法，分离 axios 配置和自定义选项）
+	 * // 第一个参数：所有 axios 原生配置（完全兼容 axios 文档）
+	 * // 第二个参数：RequestOptions（自定义行为开关）
 	 * http.request(
 	 *   {
 	 *     url: '/api/user',
 	 *     method: 'get',
 	 *     params: { id: 1 },
-	 *     timeout: 5000,
-	 *     headers: { 'X-Custom': 'value' }
+	 *     timeout: 5000,  // axios 参数
+	 *     headers: { 'X-Custom': 'value' },  // axios 参数
+	 *     // ... 其他所有 axios 支持的参数
 	 *   },
 	 *   {
-	 *     isReturnNativeResponse: true,
-	 *     skipErrorHandler: false // 进行 code 校验，code !== 200 会抛出错误
+	 *     skipErrorHandler: true,  // RequestOptions：跳过错误处理
+	 *     isShowSuccessMessage: true,  // RequestOptions：显示成功提示
+	 *     // ... 其他 RequestOptions 参数
 	 *   }
 	 * )
+	 *
+	 * // 方式4: config + config（兼容 axios 标准用法，两个配置会合并）
+	 * http.request(
+	 *   { url: '/api/user', method: 'get' },
+	 *   { params: { id: 1 }, timeout: 5000 }  // 会合并到第一个参数中
+	 * )
 	 * ```
+	 *
+	 * @note
+	 * - `requestOptions = undefined` 是预期内的，当使用 axios 标准用法时（方式1、2、4），不需要 RequestOptions
+	 * - 所有 axios 原生参数都完全支持，可以在第一个参数中使用
+	 * - RequestOptions 是自定义的行为开关，用于控制请求的额外行为（如错误处理、成功提示等）
+	 * - 使用类型守卫函数 `isRequestOptions` 动态判断第二个参数类型，避免硬编码字段列表
 	 */
 	function request<T = any>(
 		configOrUrl: AxiosRequestConfig | string,
@@ -110,38 +135,26 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 		let requestOptions: RequestOptions | undefined
 
 		if (typeof configOrUrl === 'string') {
-			// 方式：request(url, config) - 兼容 axios
+			// 方式：request(url, config) - 兼容 axios 标准用法
+			// 参照 kuka-img-pad：当第一个参数是 string 时，第二个参数只能是 AxiosRequestConfig
 			axiosConfig = { ...(optionsOrConfig as AxiosRequestConfig | undefined), url: configOrUrl }
 			requestOptions = undefined
-		} else if (
-			optionsOrConfig &&
-			('isReturnNativeResponse' in optionsOrConfig ||
-				'skipErrorHandler' in optionsOrConfig ||
-				'ignoreCancelToken' in optionsOrConfig ||
-				'isShowMessage' in optionsOrConfig ||
-				'isShowSuccessMessage' in optionsOrConfig ||
-				'isShowErrorMessage' in optionsOrConfig ||
-				'errorMessageMode' in optionsOrConfig ||
-				'successMessageText' in optionsOrConfig ||
-				'errorMessageText' in optionsOrConfig ||
-				'withToken' in optionsOrConfig ||
-				'joinTime' in optionsOrConfig ||
-				'formatDate' in optionsOrConfig ||
-				'joinParamsToUrl' in optionsOrConfig ||
-				'apiUrl' in optionsOrConfig ||
-				'urlPrefix' in optionsOrConfig ||
-				'joinPrefix' in optionsOrConfig)
-		) {
+		} else if (optionsOrConfig && isRequestOptions(optionsOrConfig)) {
 			// 方式：request(config, options) - 第二个参数是 RequestOptions
+			// 参照 kuka-img-pad：使用类型守卫函数判断，避免硬编码字段列表
+			// 注意：RequestOptions 中不应该包含 axios 配置参数，这些应该在第一个参数中传入
 			axiosConfig = configOrUrl
-			requestOptions = optionsOrConfig as RequestOptions
+			requestOptions = optionsOrConfig
 		} else {
-			// 方式：request(config) 或 request(config, config) - 兼容 axios
+			// 方式：request(config) 或 request(config, config) - 兼容 axios 标准用法
+			// 第二个参数是 AxiosRequestConfig，会合并到第一个参数中
+			// 这是 axios 的标准用法，完全兼容
 			axiosConfig = { ...configOrUrl, ...(optionsOrConfig as AxiosRequestConfig | undefined) }
 			requestOptions = undefined
 		}
 
 		// 将 RequestOptions 挂载到 config.requestOptions 上，供拦截器使用
+		// 参照 kuka-img-pad：使用 @ts-expect-error 或类型断言来处理
 		const finalConfig: HttpRequestConfig = {
 			...axiosConfig,
 			requestOptions,
@@ -152,36 +165,34 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 
 	/**
 	 * GET 请求
-	 * 完全贴合 axios.get 的使用习惯
+	 * 完全贴合 axios.get 的使用习惯，支持所有 axios 原生参数
 	 *
 	 * @example
 	 * ```ts
-	 * // axios 标准用法（所有 axios 原生参数都支持）
+	 * // 方式1: axios 标准用法（所有 axios 原生参数都支持）
+	 * // 所有 axios 文档中的参数都可以在这里使用：params, timeout, headers, etc.
 	 * http.get('/api/user', {
 	 *   params: { id: 1 },
 	 *   timeout: 5000,
-	 *   headers: { 'X-Custom': 'value' }
+	 *   headers: { 'X-Custom': 'value' },
+	 *   responseType: 'json',
+	 *   // ... 其他所有 axios 支持的参数
 	 * })
 	 *
-	 * // 带自定义选项（两个参数）
-	 * // 场景1：跳过错误处理，业务代码自己判断 code
+	 * // 方式2: 带自定义选项（三个参数）
+	 * // 第一个参数：URL
+	 * // 第二个参数：axios 配置（所有 axios 原生参数）
+	 * // 第三个参数：RequestOptions（自定义行为开关）
 	 * http.get(
 	 *   '/api/coupon',
-	 *   { params: { id: 1 } },  // axios 配置
+	 *   { params: { id: 1 }, timeout: 5000 },  // axios 配置（所有 axios 参数都支持）
 	 *   {
-	 *     skipErrorHandler: true  // 跳过错误处理，返回完整响应体
+	 *     skipErrorHandler: true,  // RequestOptions：跳过错误处理
+	 *     isShowSuccessMessage: true  // RequestOptions：显示成功提示
 	 *   }
-	 * ).then(result => {
-	 *   // result = { code: 10086, msg: '已经领取', data: { list: [...] } }
-	 *   // 业务代码可以根据 code 判断业务状态
-	 *   if (result.code === 10086) {
-	 *     showCouponList(result.data.list) // 展示已领取的券
-	 *   } else if (result.code === 200) {
-	 *     showSuccess() // 正常领取成功
-	 *   }
-	 * })
+	 * )
 	 *
-	 * // 场景2：统一错误处理（默认），code !== 200 会抛出错误
+	 * // 方式3: 统一错误处理（默认），code !== 200 会抛出错误
 	 * http.get('/api/user', { params: { id: 1 } })
 	 *   .then(result => {
 	 *     // 如果 code !== 200，不会执行到这里，会进入 catch

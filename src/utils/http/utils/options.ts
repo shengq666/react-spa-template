@@ -1,15 +1,20 @@
+import type { AxiosRequestConfig } from 'axios'
 import type { RequestOptions } from '../types'
 
 /**
- * 自定义参数键名列表
+ * 自定义参数键名列表（RequestOptions 的字段）
  *
  * 用于区分 axios 原生参数和自定义行为开关。
  * 当添加新的自定义参数时，需要：
  * 1. 在 types.ts 的 RequestOptions 接口中添加字段
  * 2. 在此数组中添加键名
  * 3. 在相应的处理逻辑中使用该参数
+ *
+ * @note
+ * 此常量与 AXIOS_CONFIG_KEYS 配合使用，用于类型守卫函数 isRequestOptions
+ * 参照 kuka-img-pad 和 Ant Design Pro：将相关常量集中管理，提高可维护性
  */
-const CUSTOM_OPTION_KEYS: (keyof RequestOptions)[] = [
+export const CUSTOM_OPTION_KEYS: (keyof RequestOptions)[] = [
 	'isReturnNativeResponse',
 	'skipErrorHandler',
 	'ignoreCancelToken',
@@ -26,6 +31,49 @@ const CUSTOM_OPTION_KEYS: (keyof RequestOptions)[] = [
 	'apiUrl',
 	'urlPrefix',
 	'joinPrefix',
+]
+
+/**
+ * axios 配置的常见字段（用于区分 RequestOptions 和 AxiosRequestConfig）
+ * 如果对象包含这些字段，更可能是 AxiosRequestConfig
+ *
+ * @note
+ * 此常量与 CUSTOM_OPTION_KEYS 配合使用，用于类型守卫函数 isRequestOptions
+ * 参照 kuka-img-pad 和 Ant Design Pro：将相关常量集中管理，提高可维护性
+ */
+export const AXIOS_CONFIG_KEYS: (keyof AxiosRequestConfig)[] = [
+	'url',
+	'method',
+	'baseURL',
+	'transformRequest',
+	'transformResponse',
+	'headers',
+	'params',
+	'paramsSerializer',
+	'data',
+	'timeout',
+	'withCredentials',
+	'adapter',
+	'auth',
+	'responseType',
+	'responseEncoding',
+	'xsrfCookieName',
+	'xsrfHeaderName',
+	'onUploadProgress',
+	'onDownloadProgress',
+	'maxContentLength',
+	'maxBodyLength',
+	'validateStatus',
+	'maxRedirects',
+	'socketPath',
+	'httpAgent',
+	'httpsAgent',
+	'proxy',
+	'cancelToken',
+	'signal',
+	'decompress',
+	'transitional',
+	'env',
 ]
 
 /**
