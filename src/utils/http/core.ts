@@ -32,6 +32,17 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 			if (token && config.headers) {
 				config.headers.Authorization = `Bearer ${token}`
 			}
+
+			// 支持 FormData：当请求数据是 FormData 时，自动处理 Content-Type
+			// FormData 需要浏览器自动设置 boundary，所以删除 Content-Type 让浏览器自动设置
+			if (config.data instanceof FormData) {
+				if (config.headers) {
+					// 删除 Content-Type，让浏览器自动设置（包含 boundary）
+					delete config.headers['Content-Type']
+					delete config.headers['content-type']
+				}
+			}
+
 			return config
 		},
 		(error: AxiosError) => {
@@ -177,6 +188,12 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	 *   headers: { 'X-Custom': 'value' },
 	 *   timeout: 5000
 	 * })
+	 *
+	 * // 支持 FormData（自动处理 Content-Type）
+	 * const formData = new FormData()
+	 * formData.append('file', file)
+	 * formData.append('name', 'John')
+	 * http.post('/api/upload', formData) // Content-Type 会自动设置为 multipart/form-data（带 boundary）
 	 *
 	 * // 带自定义选项（三个参数）
 	 * http.post(
