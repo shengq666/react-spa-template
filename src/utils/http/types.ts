@@ -27,8 +27,27 @@ export interface RequestOptions {
 
 	/**
 	 * 是否按约定格式 (code/data/message) 进行处理
-	 * - true：按 BasicResponse 约定解包并做 code 处理（默认）
-	 * - false：直接返回 response.data，不做任何包装
+	 * - true（默认）：按 BasicResponse 约定解包并做 code 处理，非 200 会抛出错误，只返回 data 字段
+	 * - false：直接返回完整的 response.data（包含 code、message、data），不做任何处理，由业务代码自己判断 code
+	 *
+	 * @example
+	 * ```ts
+	 * // 默认行为：code !== 200 会抛出错误
+	 * http.get('/api/coupon') // 如果 code !== 200，会抛出错误
+	 *
+	 * // 关闭转换：返回完整响应体，业务代码自己判断
+	 * const result = await http.get('/api/coupon', {}, {
+	 *   isTransformResponse: false
+	 * })
+	 * // result = { code: 10086, msg: '已经领取', data: { list: [...] } }
+	 * if (result.code === 10086) {
+	 *   // 业务代码根据 code 判断：已领取状态
+	 *   showCouponList(result.data.list) // 展示已领取的券
+	 * } else if (result.code === 200) {
+	 *   // 正常领取成功
+	 *   showSuccess()
+	 * }
+	 * ```
 	 */
 	isTransformResponse?: boolean
 

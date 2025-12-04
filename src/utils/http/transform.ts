@@ -64,7 +64,7 @@ export function transformResponse<T = any>(response: AxiosResponse<T>): T | Axio
 
 	const res = response.data as BasicResponse | any
 
-	// 2. 不进行任何处理，直接返回 data（常用于特殊接口或自定义解析）
+	// 2. 不进行任何处理，直接返回 data，用于页面代码可能需要直接获取code，data，message这些信息时开启（常用于特殊接口或自定义解析）
 	if (!options.isTransformResponse) {
 		return res
 	}

@@ -139,10 +139,16 @@ export function createHttp(baseConfig?: AxiosRequestConfig) {
 	 *   '/api/user',
 	 *   { params: { id: 1 }, timeout: 3000 },  // axios 配置
 	 *   {
-	 *     isTransformResponse: false,           // 自定义选项
+	 *     isTransformResponse: false,           // 返回完整响应体，业务代码自己判断 code
 	 *     errorHandling: 'manual'              // 手动处理错误，业务代码自己 catch
 	 *   }
-	 * ).catch(err => {
+	 * ).then(result => {
+	 *   // result = { code: 10086, msg: '已经领取', data: { list: [...] } }
+	 *   // 业务代码可以根据 code 判断业务状态
+	 *   if (result.code === 10086) {
+	 *     showCouponList(result.data.list)
+	 *   }
+	 * }).catch(err => {
 	 *   // err 是原始的 AxiosError，可以访问 err.response、err.request 等
 	 *   // 业务代码可以自己决定如何处理错误
 	 * })
