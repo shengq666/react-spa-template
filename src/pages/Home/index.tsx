@@ -1,10 +1,11 @@
-import { Button, Card, List, Tag, Toast } from 'antd-mobile'
+import { Button, Card, List, Result, Tag, Toast } from 'antd-mobile'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PageSkeleton } from '@/components/Skeleton'
 import { ROUTE_PATH } from '@/constants'
 import { common, format, validate } from '@/utils'
 import http from '@/utils/http'
+import { reportEvent } from '@/utils/report'
 import './index.scss'
 
 interface ListItem {
@@ -14,7 +15,8 @@ interface ListItem {
 	createTime: string
 	viewCount: number
 }
-function getHomePageBannerList(params: any) {
+
+async function getHomePageBannerList(params: any) {
 	return http.request(
 		{
 			url: '/api/galleryService/bannerInfo/getHomePageBannerList',
@@ -22,28 +24,60 @@ function getHomePageBannerList(params: any) {
 			params,
 		},
 		{
-			// // 示例：显示成功提示
-			isShowSuccessMessage: true, // 启用成功提示（使用默认消息或响应中的消息）
-			successMessageText: '获取成功', // 或者自定义成功提示消息
+			// 页面初始化类请求：推荐使用统一错误处理 + 静默成功，不弹成功 Toast ,这里写了只是告诉你有这么个功能
+			isShowSuccessMessage: true,
 		},
 	)
 }
 export default function Home() {
 	const navigate = useNavigate()
 	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
 	const [list, setList] = useState<ListItem[]>([])
 	const [currentTime, setCurrentTime] = useState(new Date())
 
+	// 示例：页面加载时的完整 HTTP 链路（loading + skeleton + error + 埋点）
+	const fetchBannerWithDemo = async () => {
+		try {
+			setLoading(true)
+			setError(null)
+
+			const result = await getHomePageBannerList({
+				displayLocation: 2,
+				configId: 10,
+				guideId: 1155073,
+				type: 3,
+			})
+
+			// 正常情况下 code === 200，直接使用 data
+			// 如果后端存在“特殊业务 code”（例如 10086 表示已领取），可以结合 skipErrorHandler 处理：
+			// const result = await http.request({ ... }, { skipErrorHandler: true })
+			// 在这里根据 result.code 做不同分支处理
+
+			reportEvent('home_banner_loaded', {
+				count: Array.isArray(result.data) ? result.data.length : 0,
+			})
+		} catch (error: any) {
+			console.error('fetchBannerWithDemo error:', error)
+			setError(error?.message || '数据加载失败，请稍后重试')
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	// 保留一个独立的 http 示例（调试用）
 	const testHttp = async () => {
 		try {
 			const result = await getHomePageBannerList({ displayLocation: 2, configId: 10, guideId: 1155073, type: 3 })
-			console.warn('======result', result)
+			console.log('======testHttp result', result)
 		} catch (error: any) {
-			console.error('======error', error)
+			console.error('======testHttp error', error)
 		}
 	}
 
 	useEffect(() => {
+		// 演示：进入页面时的标准请求链路
+		fetchBannerWithDemo()
 		testHttp()
 	}, [])
 
@@ -128,6 +162,17 @@ export default function Home() {
 				<h1 className="home-title">首页</h1>
 				<div className="home-time">当前时间: {format.datetime(currentTime)}</div>
 			</div>
+
+			{error && (
+				<div style={{ marginBottom: 16 }}>
+					<Result status="error" title="数据加载失败" description={error} />
+					<div style={{ marginTop: 12, textAlign: 'center' }}>
+						<Button color="primary" size="small" onClick={fetchBannerWithDemo}>
+							重新加载
+						</Button>
+					</div>
+				</div>
+			)}
 
 			<div className="home-actions">
 				<Button color="primary" size="small" onClick={() => navigate(ROUTE_PATH.USER)}>

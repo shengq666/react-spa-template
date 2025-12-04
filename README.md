@@ -124,9 +124,23 @@ API 基础配置在 `src/constants/index.ts` 中，通过环境变量 `VITE_API_
 
 1. 使用 TypeScript 确保类型安全
 2. 遵循 ESLint 和 Prettier 配置
-3. 使用路由懒加载优化性能
-4. 合理使用错误边界捕获错误
-5. 充分利用工具库提高开发效率
+3. 使用路由懒加载 + Suspense + 骨架屏优化首屏体验
+4. 合理使用错误边界与监控（`AppErrorBoundary` + `utils/report`）
+5. 充分利用工具库与 http 封装提高开发效率
+
+### 性能与首屏优化建议
+
+- 按需引入组件库（antd-mobile 中只按需引入实际使用的组件）
+- 路由级懒加载 + `Suspense` 包裹页面，搭配 `PageSkeleton` 做骨架屏
+- 列表图片采用懒加载（如 `loading="lazy"` 或第三方懒加载库）
+- 避免在首屏渲染时做重计算，可用 `useMemo`、`useDeferredValue` 等做优化
+
+### 安全与规范建议
+
+- 所有本地存储统一使用 `src/utils/storage.ts`，避免在业务代码中直接使用 `localStorage`
+- 生产环境建议在服务端配置基本 CSP（Content-Security-Policy）策略，防止 XSS 注入
+- 对所有外部输入（URL 参数、接口入参等）做好校验与转义
+- 不在前端代码中硬编码敏感信息（密钥、内网地址等），统一通过环境变量与后端网关控制
 
 ## 🧱 作为脚手架如何二次开发
 
@@ -200,18 +214,30 @@ API 基础配置在 `src/constants/index.ts` 中，通过环境变量 `VITE_API_
 
 ### 4. 使用和扩展全局状态（Zustand）
 
-1. 在 `src/store/userStore.ts` 中查看现有示例，按需扩展字段与方法：
-   ```ts
-   export const useUserStore = create<UserState>(set => ({
-   	userInfo: null,
-   	setUserInfo: userInfo => set({ userInfo }),
-   }))
-   ```
-2. 在任意组件中使用：
-   ```ts
-   const userInfo = useUserStore(state => state.userInfo)
-   const setUserInfo = useUserStore(state => state.setUserInfo)
-   ```
+本模板推荐的状态管理策略：
+
+- **组件局部状态**：优先使用 `useState` / `useReducer`
+- **跨组件 / 跨页面共享状态**：使用 `zustand`（`src/store` 目录）
+- 避免将所有数据都塞进全局 store，保持 store 精简、可维护
+
+示例：
+
+- `src/store/userStore.ts`：用户信息 store，包含：
+  - `user`：当前用户信息（持久化到 localStorage）
+  - `fetchCurrentUser`：模拟异步拉取当前用户信息
+- `src/store/appStore.ts`：应用级 store，包含：
+  - `appReady`：应用是否初始化完成
+  - `globalLoading`：全局 loading 状态
+  - `themeId`：当前主题 id，并与本地存储同步
+
+在组件中使用时建议通过“选择器”只取需要的字段，减少重渲染：
+
+```ts
+import { useUserStore } from '@/store/userStore'
+
+const user = useUserStore(state => state.user)
+const fetchCurrentUser = useUserStore(state => state.fetchCurrentUser)
+```
 
 ### 5. 新增环境变量
 

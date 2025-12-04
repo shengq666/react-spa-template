@@ -2,6 +2,7 @@ import type { ErrorInfo, ReactNode } from 'react'
 import { Button, Result } from 'antd-mobile'
 import { Component } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { reportError } from '@/utils/report'
 
 interface ErrorBoundaryProps {
 	children: ReactNode
@@ -25,6 +26,11 @@ class ErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBoundaryStat
 
 	componentDidCatch(error: Error, errorInfo: ErrorInfo) {
 		console.error('Error caught by boundary:', error, errorInfo)
+		reportError(error, {
+			extra: {
+				componentStack: errorInfo.componentStack,
+			},
+		})
 	}
 
 	render() {
