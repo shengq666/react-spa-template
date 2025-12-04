@@ -8,6 +8,9 @@ export default antfu(
 	},
 	{
 		rules: {
+			// 统一多行表达式里二元运算符缩进位置的风格
+			'style/indent-binary-ops': 'off',
+			'style/operator-linebreak': 'off',
 			'no-console': 'warn',
 			'style/member-delimiter-style': 'off',
 			// 箭头函数的参数是否必须用圆括号 () 包裹
