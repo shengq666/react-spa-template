@@ -1,29 +1,37 @@
-import { Button, Card } from 'antd-mobile'
+import { Button, Card, Toast } from 'antd-mobile'
+import { useUserStore } from '@/store/userStore'
 
-interface User {
-	username?: string
-	email?: string
-	[key: string]: any
-}
+export function UserStatusCard() {
+	const user = useUserStore(state => state.user)
+	const loading = useUserStore(state => state.loading)
+	const fetchCurrentUser = useUserStore(state => state.fetchCurrentUser)
+	const clearUser = useUserStore(state => state.clearUser)
 
-interface UserStatusCardProps {
-	user: User | null
-	loading: boolean
-	onFetchUser: () => void
-	onClearUser: () => void
-}
+	const handleFetchUser = async () => {
+		await fetchCurrentUser()
+		const latestUser = useUserStore.getState().user
+		Toast.show({
+			content: latestUser ? '已同步用户信息' : '未找到缓存的用户信息',
+		})
+	}
 
-export function UserStatusCard({ user, loading, onFetchUser, onClearUser }: UserStatusCardProps) {
+	const handleClearUser = () => {
+		clearUser()
+		Toast.show({
+			content: '已清空用户信息',
+		})
+	}
+
 	return (
 		<Card style={{ marginBottom: 12 }}>
 			<div className="home-meta">
 				<div style={{ marginBottom: 4 }}>用户状态：{user ? user.username || user.email || '已登录' : '未登录'}</div>
 				<div style={{ marginBottom: 8 }}>Store Loading：{loading ? '是' : '否'}</div>
 				<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-					<Button size="small" onClick={onFetchUser}>
+					<Button size="small" onClick={handleFetchUser}>
 						同步用户信息
 					</Button>
-					<Button size="small" color="warning" onClick={onClearUser}>
+					<Button size="small" color="warning" onClick={handleClearUser}>
 						清空用户信息
 					</Button>
 				</div>

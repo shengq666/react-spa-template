@@ -1,25 +1,8 @@
-import type { BrandId } from '@/theme/tokens'
 import { Button, Card, Tag } from 'antd-mobile'
-import { applyTheme } from '@/theme/applyTheme'
-import { BRAND_OPTIONS } from '@/theme/tokens'
+import { useAppStatus } from '../hooks'
 
-interface AppStatusCardProps {
-	appReady: boolean
-	globalLoading: boolean
-	themeId: BrandId | null
-	onThemeChange: (themeId: BrandId) => void
-}
-
-export function AppStatusCard({ appReady, globalLoading, themeId, onThemeChange }: AppStatusCardProps) {
-	const handleThemeToggle = () => {
-		const allIds = BRAND_OPTIONS.map(item => item.id)
-		const current = themeId || 'brand1'
-		const candidates = allIds.filter(id => id !== current)
-		const nextTheme = (candidates[Math.floor(Math.random() * candidates.length)] || current) as BrandId
-
-		onThemeChange(nextTheme)
-		applyTheme(nextTheme)
-	}
+export function AppStatusCard() {
+	const { appReady, globalLoading, themeId, handleThemeToggle } = useAppStatus()
 
 	return (
 		<Card style={{ marginBottom: 12 }}>

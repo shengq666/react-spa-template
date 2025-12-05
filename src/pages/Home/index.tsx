@@ -1,11 +1,8 @@
 import type { ArticleItem } from './components'
-import type { BrandId } from '@/theme/tokens'
 import { Toast } from 'antd-mobile'
 import { useEffect, useState } from 'react'
 import { PageSkeleton } from '@/components/Skeleton'
-import { useAppStore } from '@/store/appStore'
-import { useUserStore } from '@/store/userStore'
-import { common, format, validate } from '@/utils'
+import { common } from '@/utils'
 import http from '@/utils/http'
 import { reportEvent } from '@/utils/report'
 import {
@@ -37,17 +34,6 @@ export default function Home() {
 	const [error, setError] = useState<string | null>(null)
 	const [list, setList] = useState<ArticleItem[]>([])
 	const [currentTime, setCurrentTime] = useState(() => new Date())
-
-	// 分别选择字段，避免对象 selector 在 StrictMode 下造成不必要的重复渲染
-	const appReady = useAppStore(state => state.appReady)
-	const globalLoading = useAppStore(state => state.globalLoading)
-	const themeId = useAppStore(state => state.themeId)
-	const setThemeId = useAppStore(state => state.setThemeId)
-
-	const user = useUserStore(state => state.user)
-	const userLoading = useUserStore(state => state.loading)
-	const fetchCurrentUser = useUserStore(state => state.fetchCurrentUser)
-	const clearUser = useUserStore(state => state.clearUser)
 
 	// 示例：页面加载时的完整 HTTP 链路（loading + skeleton + error + 埋点）
 	const fetchBannerWithDemo = async () => {
@@ -146,56 +132,6 @@ export default function Home() {
 		return () => clearInterval(timer)
 	}, [])
 
-	// 验证邮箱示例
-	const handleEmailCheck = () => {
-		const email = 'test@example.com'
-		const isValid = validate.email(email)
-		Toast.show({
-			icon: isValid ? 'success' : 'fail',
-			content: `${email} ${isValid ? '有效' : '无效'}`,
-		})
-	}
-
-	// 格式化数字示例
-	const handleFormatNumber = () => {
-		const number = 1234567.89
-		const formatted = format.number(number)
-		Toast.show({
-			content: `格式化: ${number} -> ${formatted}`,
-		})
-	}
-
-	const handleThemeChange = (newThemeId: BrandId) => {
-		setThemeId(newThemeId)
-		Toast.show({
-			content: `已切换到 ${newThemeId} 主题（示例）`,
-		})
-	}
-
-	const handleFetchUserInfo = async () => {
-		await fetchCurrentUser()
-		const latestUser = useUserStore.getState().user
-		Toast.show({
-			content: latestUser ? '已同步用户信息' : '未找到缓存的用户信息',
-		})
-	}
-
-	const handleClearUser = () => {
-		clearUser()
-		Toast.show({
-			content: '已清空用户信息',
-		})
-	}
-
-	const handleReportAction = () => {
-		reportEvent('home_manual_action', {
-			ts: Date.now(),
-		})
-		Toast.show({
-			content: '已触发示例埋点（控制台可见）',
-		})
-	}
-
 	if (loading) {
 		return <PageSkeleton rows={5} />
 	}
@@ -206,23 +142,13 @@ export default function Home() {
 
 			{error && <ErrorView error={error} onRetry={fetchBannerWithDemo} />}
 
-			<ActionButtons onEmailCheck={handleEmailCheck} onFormatNumber={handleFormatNumber} />
+			<ActionButtons />
 
-			<AppStatusCard
-				appReady={appReady}
-				globalLoading={globalLoading}
-				themeId={themeId as BrandId | null}
-				onThemeChange={handleThemeChange}
-			/>
+			<AppStatusCard />
 
-			<UserStatusCard
-				user={user}
-				loading={userLoading}
-				onFetchUser={handleFetchUserInfo}
-				onClearUser={handleClearUser}
-			/>
+			<UserStatusCard />
 
-			<AnalyticsCard onReport={handleReportAction} />
+			<AnalyticsCard />
 
 			<ArticleList list={list} />
 		</div>
