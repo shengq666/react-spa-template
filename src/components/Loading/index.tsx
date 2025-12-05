@@ -1,6 +1,6 @@
 import { SpinLoading } from 'antd-mobile'
 import classNames from 'classnames'
-import './index.scss'
+import styles from './index.module.scss'
 
 interface LoadingProps {
 	className?: string
@@ -10,9 +10,9 @@ interface LoadingProps {
 
 export function Loading({ className, tip }: LoadingProps) {
 	return (
-		<div className={classNames('loading-wrapper', className)}>
+		<div className={classNames(styles.loadingWrapper, className)}>
 			<SpinLoading style={{ '--size': '48px' }} />
-			{tip && <div className="loading-tip">{tip}</div>}
+			{tip && <div className={styles.loadingTip}>{tip}</div>}
 		</div>
 	)
 }
