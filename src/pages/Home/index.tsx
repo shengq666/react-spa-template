@@ -3,8 +3,8 @@ import { Toast } from 'antd-mobile'
 import { useEffect, useState } from 'react'
 import { PageSkeleton } from '@/components/Skeleton'
 import { common } from '@/utils'
-import http from '@/utils/http'
 import { reportEvent } from '@/utils/report'
+import { getHomePageBannerList } from './api'
 import {
 	ActionButtons,
 	AnalyticsCard,
@@ -16,19 +16,6 @@ import {
 } from './components'
 import styles from './index.module.scss'
 
-async function getHomePageBannerList(params: any) {
-	return http.request(
-		{
-			url: '/api/galleryService/bannerInfo/getHomePageBannerList',
-			method: 'get',
-			params,
-		},
-		{
-			// 页面初始化类请求：推荐使用统一错误处理 + 静默成功，不弹成功 Toast ,这里写了只是告诉你有这么个功能
-			isShowSuccessMessage: true,
-		},
-	)
-}
 export default function Home() {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
