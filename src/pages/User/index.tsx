@@ -3,7 +3,7 @@ import { Avatar, Badge, Button, Card, List, Toast } from 'antd-mobile'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PageSkeleton } from '@/components/Skeleton'
-import { ROUTE_PATH, STORAGE_KEYS } from '@/constants'
+import { STORAGE_KEYS } from '@/constants'
 import { useUserStore } from '@/store/userStore'
 import { common, format, storage, validate } from '@/utils'
 import styles from './index.module.scss'
@@ -109,7 +109,7 @@ export default function User() {
 
 	// 返回首页
 	const handleGoHome = () => {
-		navigate(ROUTE_PATH.HOME)
+		navigate('/')
 	}
 
 	if (loading) {

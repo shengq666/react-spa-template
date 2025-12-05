@@ -1,6 +1,5 @@
 import { Button, Toast } from 'antd-mobile'
 import { useNavigate } from 'react-router-dom'
-import { ROUTE_PATH } from '@/constants'
 import { format, validate } from '@/utils'
 import styles from './ActionButtons.module.scss'
 
@@ -26,10 +25,10 @@ export function ActionButtons() {
 
 	return (
 		<div className={styles.actions}>
-			<Button color="primary" size="small" onClick={() => navigate(ROUTE_PATH.USER)}>
+			<Button color="primary" size="small" onClick={() => navigate('/user')}>
 				前往用户页
 			</Button>
-			<Button color="primary" size="small" onClick={() => navigate(ROUTE_PATH.THEME_DEMO)}>
+			<Button color="primary" size="small" onClick={() => navigate('/theme-demo')}>
 				前往主题配色页
 			</Button>
 			<Button color="success" size="small" onClick={handleEmailCheck}>

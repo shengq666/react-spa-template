@@ -74,8 +74,8 @@ export const routeModules: RouteConfig[] = [
 
 ```typescript
 {
-  path: '/path',           // 路由路径
-  name: 'RouteName',      // 路由名称（可选）
+  path: '/path',           // 路由路径（必须）- 用于 URL 映射和导航
+  name: 'RouteName',      // 路由名称（可选）- 仅用于标识和文档，不用于导航
   meta: {                 // 路由元信息（可选）
     title: '页面标题',
     requiresAuth: true,
@@ -87,6 +87,26 @@ export const routeModules: RouteConfig[] = [
     return true
   },
 }
+```
+
+### 路由导航
+
+**重要**：React Router 不支持通过 `name` 进行路由跳转，必须使用 `path`。
+
+```typescript
+// ✅ 正确：使用 path 进行导航
+import { useNavigate } from 'react-router-dom'
+
+function MyComponent() {
+	const navigate = useNavigate()
+
+	// 使用 path 跳转
+	navigate('/user')
+	navigate('/article/:id', { params: { id: '123' } })
+}
+
+// ❌ 错误：React Router 不支持通过 name 跳转
+// navigate({ name: 'User' })  // 不支持
 ```
 
 ### 重定向路由
@@ -101,9 +121,25 @@ export const routeModules: RouteConfig[] = [
 ## 最佳实践
 
 1. **按业务模块划分**：每个业务模块一个路由文件
-2. **统一命名规范**：路由名称使用 PascalCase
-3. **路由守卫**：需要权限控制的路由统一配置 guard
-4. **404 处理**：在 `index.ts` 最后添加通配符路由
+2. **统一命名规范**：路由名称使用 PascalCase（仅用于标识）
+3. **路由导航**：**必须使用 `path` 进行导航**，`name` 不用于导航
+4. **路由守卫**：需要权限控制的路由统一配置 guard
+5. **404 处理**：在 `index.ts` 最后添加通配符路由
+
+### 路由导航示例
+
+```typescript
+// ✅ 推荐：直接使用 path 字符串
+navigate('/user')
+navigate('/article/123')
+
+// ✅ 也可以：使用变量存储 path（便于维护）
+const USER_PATH = '/user'
+navigate(USER_PATH)
+
+// ❌ 不推荐：使用 name（React Router 不支持）
+// navigate({ name: 'User' })
+```
 
 ## 未来扩展
 

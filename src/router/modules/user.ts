@@ -1,11 +1,10 @@
 import type { RouteConfig } from '@/types'
-import { ROUTE_PATH } from '@/constants'
 
 // 用户模块路由
 export const userRoutes: RouteConfig[] = [
 	{
-		path: ROUTE_PATH.USER,
-		name: 'User',
+		path: '/user', // 路由路径，用于 URL 映射和导航
+		name: 'User', // 路由名称，仅用于标识，不用于导航
 		meta: {
 			title: '用户中心',
 			innerPage: true,

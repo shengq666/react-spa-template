@@ -13,15 +13,6 @@ export const API_CONFIG = {
 	timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
 }
 
-// 路由路径
-export const ROUTE_PATH = {
-	HOME: '/',
-	USER: '/user',
-	LOGIN: '/login',
-	NOT_FOUND: '/404',
-	THEME_DEMO: '/theme-demo',
-} as const
-
 // 品牌主题相关（用于多主题切换）
 export const BRAND_QUERY_KEY = 'brandId'
 

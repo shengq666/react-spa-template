@@ -27,8 +27,11 @@ export interface RouteMeta {
 
 // 路由配置类型（类似 Vue Router，支持 v7 新特性）
 export interface RouteConfig {
+	/** 路由路径，用于 URL 映射和导航（必须） */
 	path: string
+	/** 路由名称，仅用于标识和文档，不用于导航（可选） */
 	name?: string
+	/** 路由元信息（可选） */
 	meta?: RouteMeta
 	component?: () => Promise<{ default: React.ComponentType<any> }>
 	element?: React.ReactNode

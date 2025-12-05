@@ -1,5 +1,4 @@
 import type { RouteConfig } from '@/types'
-import { ROUTE_PATH } from '@/constants'
 // 路由模块统一导出
 import { homeRoutes } from './home'
 import { themeRoutes } from './theme'
@@ -11,7 +10,7 @@ export const routeModules: RouteConfig[] = [
 	...userRoutes,
 	...themeRoutes,
 	{
-		path: ROUTE_PATH.NOT_FOUND,
+		path: '/404',
 		name: 'NotFound',
 		meta: {
 			title: '页面不存在',
@@ -22,6 +21,6 @@ export const routeModules: RouteConfig[] = [
 	// 404 通配符重定向（放在最后）
 	{
 		path: '*',
-		redirect: ROUTE_PATH.NOT_FOUND,
+		redirect: '/404',
 	},
 ]
