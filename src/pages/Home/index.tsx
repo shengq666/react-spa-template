@@ -1,25 +1,23 @@
+import type { ArticleItem } from './components'
 import type { BrandId } from '@/theme/tokens'
-import { Button, Card, List, Result, Tag, Toast } from 'antd-mobile'
+import { Toast } from 'antd-mobile'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { PageSkeleton } from '@/components/Skeleton'
-import { ROUTE_PATH } from '@/constants'
 import { useAppStore } from '@/store/appStore'
 import { useUserStore } from '@/store/userStore'
-import { applyTheme } from '@/theme/applyTheme'
-import { BRAND_OPTIONS } from '@/theme/tokens'
 import { common, format, validate } from '@/utils'
 import http from '@/utils/http'
 import { reportEvent } from '@/utils/report'
-import './index.scss'
-
-interface ListItem {
-	id: number
-	title: string
-	content: string
-	createTime: string
-	viewCount: number
-}
+import {
+	ActionButtons,
+	AnalyticsCard,
+	AppStatusCard,
+	ArticleList,
+	ErrorView,
+	HomeHeader,
+	UserStatusCard,
+} from './components'
+import styles from './index.module.scss'
 
 async function getHomePageBannerList(params: any) {
 	return http.request(
@@ -35,10 +33,9 @@ async function getHomePageBannerList(params: any) {
 	)
 }
 export default function Home() {
-	const navigate = useNavigate()
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const [list, setList] = useState<ListItem[]>([])
+	const [list, setList] = useState<ArticleItem[]>([])
 	const [currentTime, setCurrentTime] = useState(() => new Date())
 
 	// 分别选择字段，避免对象 selector 在 StrictMode 下造成不必要的重复渲染
@@ -103,7 +100,7 @@ export default function Home() {
 			setLoading(true)
 			// 模拟 API 调用
 			await common.sleep(1500)
-			const mockData: ListItem[] = [
+			const mockData: ArticleItem[] = [
 				{
 					id: 1,
 					title: '欢迎使用 React SPA Template',
@@ -168,19 +165,10 @@ export default function Home() {
 		})
 	}
 
-	const handleThemeToggle = () => {
-		const allIds = BRAND_OPTIONS.map(item => item.id)
-		const current = (themeId as BrandId) || 'brand1'
-		const candidates = allIds.filter(id => id !== current)
-		const nextTheme = (candidates[Math.floor(Math.random() * candidates.length)] || current) as BrandId
-
-		// 更新演示用的全局状态
-		setThemeId(nextTheme)
-		// 实际应用主题（切换 CSS 变量）
-		applyTheme(nextTheme)
-
+	const handleThemeChange = (newThemeId: BrandId) => {
+		setThemeId(newThemeId)
 		Toast.show({
-			content: `已切换到 ${nextTheme} 主题（示例）`,
+			content: `已切换到 ${newThemeId} 主题（示例）`,
 		})
 	}
 
@@ -213,95 +201,30 @@ export default function Home() {
 	}
 
 	return (
-		<div className="home-page">
-			<div className="home-header">
-				<h1 className="home-title">首页</h1>
-				<div className="home-time">当前时间: {format.datetime(currentTime)}</div>
-			</div>
+		<div className={styles.homePage}>
+			<HomeHeader currentTime={currentTime} />
 
-			{error && (
-				<div style={{ marginBottom: 16 }}>
-					<Result status="error" title="数据加载失败" description={error} />
-					<div style={{ marginTop: 12, textAlign: 'center' }}>
-						<Button color="primary" size="small" onClick={fetchBannerWithDemo}>
-							重新加载
-						</Button>
-					</div>
-				</div>
-			)}
+			{error && <ErrorView error={error} onRetry={fetchBannerWithDemo} />}
 
-			<div className="home-actions">
-				<Button color="primary" size="small" onClick={() => navigate(ROUTE_PATH.USER)}>
-					前往用户页
-				</Button>
-				<Button color="primary" size="small" onClick={() => navigate(ROUTE_PATH.THEME_DEMO)}>
-					前往主题配色页
-				</Button>
-				<Button color="success" size="small" onClick={handleEmailCheck}>
-					验证邮箱
-				</Button>
-				<Button color="warning" size="small" onClick={handleFormatNumber}>
-					格式化数字
-				</Button>
-			</div>
+			<ActionButtons onEmailCheck={handleEmailCheck} onFormatNumber={handleFormatNumber} />
 
-			<Card style={{ marginBottom: 12 }}>
-				<div className="home-meta">
-					<div>
-						<Tag color="primary">App Ready: {appReady ? '是' : '否'}</Tag>
-					</div>
-					<div style={{ margin: '8px 0' }}>
-						<Tag color="warning">Global Loading: {globalLoading ? '是' : '否'}</Tag>
-					</div>
-					<div style={{ marginBottom: 8 }}>当前主题: {themeId ?? 'default'}</div>
-					<Button size="small" onClick={handleThemeToggle}>
-						切换主题示例
-					</Button>
-				</div>
-			</Card>
+			<AppStatusCard
+				appReady={appReady}
+				globalLoading={globalLoading}
+				themeId={themeId as BrandId | null}
+				onThemeChange={handleThemeChange}
+			/>
 
-			<Card style={{ marginBottom: 12 }}>
-				<div className="home-meta">
-					<div style={{ marginBottom: 4 }}>用户状态：{user ? user.username || user.email || '已登录' : '未登录'}</div>
-					<div style={{ marginBottom: 8 }}>Store Loading：{userLoading ? '是' : '否'}</div>
-					<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-						<Button size="small" onClick={handleFetchUserInfo}>
-							同步用户信息
-						</Button>
-						<Button size="small" color="warning" onClick={handleClearUser}>
-							清空用户信息
-						</Button>
-					</div>
-				</div>
-			</Card>
+			<UserStatusCard
+				user={user}
+				loading={userLoading}
+				onFetchUser={handleFetchUserInfo}
+				onClearUser={handleClearUser}
+			/>
 
-			<Card style={{ marginBottom: 12 }}>
-				<div className="home-meta">
-					<div style={{ marginBottom: 8 }}>埋点 / 事件示例</div>
-					<Button size="small" color="success" onClick={handleReportAction}>
-						触发埋点事件
-					</Button>
-				</div>
-			</Card>
+			<AnalyticsCard onReport={handleReportAction} />
 
-			<List header="文章列表">
-				{list.map(item => (
-					<List.Item key={item.id}>
-						<Card>
-							<div className="list-item">
-								<div className="list-item-header">
-									<h3 className="list-item-title">{item.title}</h3>
-									<Tag color="primary">{format.number(item.viewCount)} 浏览</Tag>
-								</div>
-								<p className="list-item-content">{item.content}</p>
-								<div className="list-item-footer">
-									<span className="list-item-time">{format.fromNow(item.createTime)}</span>
-								</div>
-							</div>
-						</Card>
-					</List.Item>
-				))}
-			</List>
+			<ArticleList list={list} />
 		</div>
 	)
 }

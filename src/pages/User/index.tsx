@@ -6,7 +6,7 @@ import { PageSkeleton } from '@/components/Skeleton'
 import { ROUTE_PATH, STORAGE_KEYS } from '@/constants'
 import { useUserStore } from '@/store/userStore'
 import { common, format, storage, validate } from '@/utils'
-import './index.scss'
+import styles from './index.module.scss'
 
 export default function User() {
 	const navigate = useNavigate()
@@ -118,47 +118,47 @@ export default function User() {
 
 	if (!userInfo) {
 		return (
-			<div className="user-page">
+			<div className={styles.userPage}>
 				<Card>
-					<div className="empty-state">暂无用户信息</div>
+					<div className={styles.emptyState}>暂无用户信息</div>
 				</Card>
 			</div>
 		)
 	}
 
 	return (
-		<div className="user-page">
-			<Card className="user-header">
-				<div className="user-avatar-section">
+		<div className={styles.userPage}>
+			<Card className={styles.userHeader}>
+				<div className={styles.userAvatarSection}>
 					<Badge content={userInfo.stats.posts}>
 						<Avatar src={userInfo.avatar ?? 'https://via.placeholder.com/80'} style={{ '--size': '80px' }} />
 					</Badge>
 				</div>
-				<div className="user-info-section">
-					<h2 className="user-name">{userInfo.username}</h2>
-					<p className="user-email">{userInfo.email}</p>
-					<div className="user-time">
+				<div className={styles.userInfoSection}>
+					<h2 className={styles.userName}>{userInfo.username}</h2>
+					<p className={styles.userEmail}>{userInfo.email}</p>
+					<div className={styles.userTime}>
 						<span>注册: {format.fromNow(userInfo.createTime)}</span>
 					</div>
 				</div>
 			</Card>
 
-			<Card className="user-stats">
-				<div className="stats-item">
-					<div className="stats-value">{format.number(userInfo.stats.posts)}</div>
-					<div className="stats-label">文章</div>
+			<Card className={styles.userStats}>
+				<div className={styles.statsItem}>
+					<div className={styles.statsValue}>{format.number(userInfo.stats.posts)}</div>
+					<div className={styles.statsLabel}>文章</div>
 				</div>
-				<div className="stats-item">
-					<div className="stats-value">{format.number(userInfo.stats.followers)}</div>
-					<div className="stats-label">粉丝</div>
+				<div className={styles.statsItem}>
+					<div className={styles.statsValue}>{format.number(userInfo.stats.followers)}</div>
+					<div className={styles.statsLabel}>粉丝</div>
 				</div>
-				<div className="stats-item">
-					<div className="stats-value">{format.number(userInfo.stats.following)}</div>
-					<div className="stats-label">关注</div>
+				<div className={styles.statsItem}>
+					<div className={styles.statsValue}>{format.number(userInfo.stats.following)}</div>
+					<div className={styles.statsLabel}>关注</div>
 				</div>
 			</Card>
 
-			<div className="user-actions">
+			<div className={styles.userActions}>
 				<Button color="primary" block onClick={handleValidateEmail}>
 					验证邮箱格式
 				</Button>
@@ -179,7 +179,7 @@ export default function User() {
 				</Button>
 			</div>
 
-			<Card className="user-details">
+			<Card className={styles.userDetails}>
 				<List header="详细信息">
 					<List.Item extra={format.datetime(userInfo.createTime)}>注册时间</List.Item>
 					<List.Item extra={format.fromNow(userInfo.lastLoginTime)}>最后登录</List.Item>

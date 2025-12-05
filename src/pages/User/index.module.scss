@@ -1,0 +1,80 @@
+.userPage {
+	padding: 16px;
+	background: var(--bg-color-secondary);
+	min-height: 100vh;
+}
+
+.userHeader {
+	margin-bottom: 16px;
+	padding: 20px;
+}
+
+.userAvatarSection {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 16px;
+}
+
+.userInfoSection {
+	text-align: center;
+}
+
+.userName {
+	font-size: var(--font-size-xl);
+	font-weight: bold;
+	color: var(--text-color);
+	margin-bottom: 8px;
+}
+
+.userEmail {
+	font-size: var(--font-size-sm);
+	color: var(--text-color-secondary);
+	margin-bottom: 8px;
+}
+
+.userTime {
+	font-size: var(--font-size-xs);
+	color: var(--text-color-secondary);
+}
+
+.userStats {
+	margin-bottom: 16px;
+	padding: 20px;
+	display: flex;
+	justify-content: space-around;
+}
+
+.statsItem {
+	text-align: center;
+}
+
+.statsValue {
+	font-size: var(--font-size-xl);
+	font-weight: bold;
+	color: var(--primary-color);
+	margin-bottom: 4px;
+}
+
+.statsLabel {
+	font-size: var(--font-size-sm);
+	color: var(--text-color-secondary);
+}
+
+.userActions {
+	margin-bottom: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.userDetails {
+	:global(.adm-list-item-content) {
+		font-size: var(--font-size-sm);
+	}
+}
+
+.emptyState {
+	text-align: center;
+	padding: 40px;
+	color: var(--text-color-secondary);
+}

@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom'
 import { BRAND_QUERY_KEY } from '@/constants'
 import { BRAND_OPTIONS, isValidBrandId } from '@/theme/tokens'
 import { useTheme } from '@/theme/useTheme'
-import './index.scss'
+import styles from './index.module.scss'
 
 export default function ThemeDemo() {
 	const [searchParams, setSearchParams] = useSearchParams()
@@ -29,14 +29,14 @@ export default function ThemeDemo() {
 	}
 
 	return (
-		<div className="theme-demo-page">
-			<h1 className="theme-demo-title">多主题演示</h1>
-			<p className="theme-demo-desc">
+		<div className={styles.themeDemoPage}>
+			<h1 className={styles.themeDemoTitle}>多主题演示</h1>
+			<p className={styles.themeDemoDesc}>
 				当前品牌 ID：<Tag color="primary">{brandId}</Tag>
 			</p>
 
-			<Card title="切换品牌主题" className="theme-demo-card">
-				<div className="theme-demo-buttons">
+			<Card title="切换品牌主题" className={styles.themeDemoCard}>
+				<div className={styles.themeDemoButtons}>
 					{BRAND_OPTIONS.map(option => (
 						<Button
 							key={option.id}
@@ -50,8 +50,8 @@ export default function ThemeDemo() {
 				</div>
 			</Card>
 
-			<Card title="主题效果预览" className="theme-demo-card">
-				<div className="theme-demo-preview">
+			<Card title="主题效果预览" className={styles.themeDemoCard}>
+				<div className={styles.themeDemoPreview}>
 					<Button color="primary" block>
 						主按钮（primaryColor）
 					</Button>

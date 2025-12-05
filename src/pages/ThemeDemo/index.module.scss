@@ -1,31 +1,31 @@
-.theme-demo-page {
+.themeDemoPage {
 	min-height: 100vh;
 	padding: 16px;
 	background-color: var(--bg-color-secondary);
 }
 
-.theme-demo-title {
+.themeDemoTitle {
 	margin-bottom: 8px;
 	font-size: var(--font-size-lg);
 	color: var(--text-color);
 }
 
-.theme-demo-desc {
+.themeDemoDesc {
 	margin-bottom: 16px;
 	color: var(--text-color-secondary);
 }
 
-.theme-demo-card {
+.themeDemoCard {
 	margin-bottom: 16px;
 }
 
-.theme-demo-buttons {
+.themeDemoButtons {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
 }
 
-.theme-demo-preview {
+.themeDemoPreview {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;

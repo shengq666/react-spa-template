@@ -1,0 +1,35 @@
+.listItem {
+	display: block;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 8px;
+}
+
+.title {
+	font-size: var(--font-size-md);
+	font-weight: 600;
+	color: var(--text-color);
+	flex: 1;
+	margin-right: 8px;
+}
+
+.content {
+	font-size: var(--font-size-sm);
+	color: var(--text-color-secondary);
+	line-height: 1.6;
+	margin-bottom: 8px;
+}
+
+.footer {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.time {
+	font-size: var(--font-size-xs);
+	color: var(--text-color-secondary);
+}
