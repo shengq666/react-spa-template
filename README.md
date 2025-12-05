@@ -1,3 +1,9 @@
+<div align="center">
+
+[English](./README.en.md) | **中文**
+
+</div>
+
 # React SPA Template
 
 一个成熟的前端 CSR SPA 项目开发模板，基于 Vite + React + TypeScript 构建。
